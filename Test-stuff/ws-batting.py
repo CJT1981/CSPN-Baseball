@@ -6,21 +6,22 @@ url = "https://www.baseball-reference.com/teams/ATL/2026.shtml"
 html_page = requests.get(url)
 html_page.encoding = "utf-8" # <-- this accounts for the special char in names
 team_html = BeautifulSoup(html_page.text, "html.parser")
-
-team_tables = team_html.find_all('table')[10]
+'''
+<table class="stats_table sortable soc now_sortable sticky_table eq2 re2 le2" 
+id="players_standard_batting" data-cols-to-freeze=",2" data-soc-sum-scope-type="player_season" 
+data-soc-sum-phase-type="reg" data-soc-sum-table-type="Batting::BattingStandard" 
+data-soc-sum-params="null" data-soc-sum-year="2025">…</table>
+'''
+# above is the table we want to scrape, but we can also find it by its id as shown below
+team_tables = team_html.find('table', id='players_standard_batting')
 # print(team_tables.prettify())
 
-# The below line is flawed because this line of code includes repeated headers. We 
-# only want to return unique headers therefore the line below the next fixes this
-# table_titles = team_tables.find_all('th')
 table_titles = team_tables.find('thead').find_all('th')
 # print(table_titles)
 
-# Cleaning up the table headers
 categories = [title.text.strip() for title in table_titles]
 # print(categories)
 
-# Creating the data frame using the table headers (categories) as the columns
 team_dataframe = pd.DataFrame(columns = categories)
 # print(team_dataframe)
 
@@ -41,6 +42,15 @@ for each_row in all_data:
     rank = row_header.text.strip()
     individual_row_data.insert(0, rank)
 
+    # To remove pitcher names from coming up in the batting data, we can skip
+    # over any rows that include "P" in the position column (Pos)
+    # Find the position column
+    pos_index = categories.index('Pos')
+
+    # Skip pitchers
+    if individual_row_data[pos_index] == 'P':
+        continue
+
     # Clean player names
     player_name = individual_row_data[1]
 
@@ -52,12 +62,6 @@ for each_row in all_data:
 
     individual_row_data[1] = player_name
 
-    # Stop after Luke Williams
-    if "Luke Williams" in individual_row_data:
-        length = len(team_dataframe)
-        team_dataframe.loc[length] = individual_row_data
-        break
-
     # Add normal rows
     length = len(team_dataframe)
     team_dataframe.loc[length] = individual_row_data
@@ -66,4 +70,4 @@ for each_row in all_data:
 print(team_dataframe)
 
 # Transfer to csv
-team_dataframe.to_csv(r'C:\Users\chris\CSPN-Baseball\atlanta-braves-test2',index=False)
+team_dataframe.to_csv(r'C:\Users\chris\CSPN-Baseball\Test-stuff\atl-batting-test2.csv',index=False)
