@@ -1,97 +1,118 @@
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
+import time
 
 # creating a list of teams and years to loop through for scraping data from multiple pages
 teams = [
-    "ATL", "NYY", "BOS"
+    "ATL", "PHI", "WSN", "MIA", "NYM", "NYY", "TBR", "TOR", "BAL", "BOS",
+    "CIN", "PIT", "STL", "MIL", "CHC", "CWS", "CLE", "DET", "KC", "MIN", 
+    "ARI", "COL", "LAD", "SDP", "SFG", "OAK", "SEA", "HOU", "LAA", "TEX"
     ]
-year = "2026"
+# creating a list of years to loop through for scraping data from multiple pages
+years = range(2020, 2027)
 
-
+master_list = []
+# looping through each team and year to scrape the data and store it in a dataframe, 
+# then transfer it to a csv file
 for team in teams:
+    for year in years:
+        print(f"Scraping data for {team} in {year}...")
 
-    url = f"https://www.baseball-reference.com/teams/{team}/{year}.shtml"
-    html_page = requests.get(url)
-    html_page.encoding = "utf-8" # <-- this accounts for the special char in names
-    team_html = BeautifulSoup(html_page.text, "html.parser")
-    '''
-    <table class="stats_table sortable soc now_sortable sticky_table eq2 re2 le2" 
-    id="players_standard_batting" data-cols-to-freeze=",2" data-soc-sum-scope-type="player_season" 
-    data-soc-sum-phase-type="reg" data-soc-sum-table-type="Batting::BattingStandard" 
-    data-soc-sum-params="null" data-soc-sum-year="2025">…</table>
-    '''
-    # above is the table we want to scrape, but we can also find it by its id as shown below
-    team_tables = team_html.find('table', id='players_standard_batting')
-    # print(team_tables.prettify())
-
-    table_titles = team_tables.find('thead').find_all('th')
-    # print(table_titles)
-
-    categories = [title.text.strip() for title in table_titles]
-    # removes the duplicate 'POS' column that appears in the table
-    categories.pop(-2)
-    # print(categories)
-
-    team_dataframe = pd.DataFrame(columns = categories)
-    # print(team_dataframe)
-
-    # Getting all the table data
-    all_data = team_tables.find_all('tr')
-    # print(all_data)
-
-    # Cleaning the data
-    for each_row in all_data:
-        row_header = each_row.find('th')
-
-        if row_header is None:
-            continue
-
-        row_data = each_row.find_all('td')
-        individual_row_data = [data.text.strip() for data in row_data]
-
-        # Skip empty rows
-        if len(individual_row_data) == 0:
-            continue
+        # Construct the URL for the team's batting statistics page for the given year
+        url = f"https://www.baseball-reference.com/teams/{team}/{year}.shtml"
         
-        rank = row_header.text.strip()
+        html_page = requests.get(url)
 
-        # Skip repeated header rows
-        if rank == 'Rk':
+        # Adding a delay between requests to avoid overwhelming the server
+        time.sleep(3)
+        
+        # Check if the request was successful
+        if html_page.status_code != 200:
+            print(f"Failed to retrieve data for {team} in {year}. Status code: {html_page.status_code}")
             continue
 
-        individual_row_data.insert(0, rank)
-        # removes the values in the duplicate 'POS' column that appears in the table
-        individual_row_data.pop(-2)
+        html_page.encoding = "utf-8" # <-- this accounts for the special char in names
+        team_html = BeautifulSoup(html_page.text, "html.parser")
 
-        # To remove pitcher names from coming up in the batting data, we can skip
-        # over any rows that include "P" in the position column (Pos)
-        # Find the position column
-        pos_index = categories.index('Pos')
+        team_tables = team_html.find('table', id='players_standard_batting')
 
-        # Skip pitchers
-        if individual_row_data[pos_index] == 'P':
+        # If the table is not found, skip to the next iteration
+        if team_tables is None:
+            print(f"No batting data found for {team} in {year}. Skipping...")
             continue
 
-        # Clean player names
-        player_name = individual_row_data[1]
+        table_titles = team_tables.find('thead').find_all('th')
 
-        player_name = player_name.replace("*", "")
-        player_name = player_name.replace("#", "")
+        categories = [title.text.strip() for title in table_titles]
+        # removes the duplicate 'POS' column that appears in the table
+        categories.pop(-2)
 
-        # Remove anything inside parentheses
-        player_name = player_name.split("(")[0].strip()
+        team_dataframe = pd.DataFrame(columns = categories)
 
-        individual_row_data[1] = player_name
+        # Getting all the table data
+        all_data = team_tables.find_all('tr')
 
-        # Add normal rows
-        length = len(team_dataframe)
-        team_dataframe.loc[length] = individual_row_data
-    # Completed Table
-    print(team_dataframe)
-    
-    # Transfer to csv
-    team_dataframe.to_csv(fr'C:\Users\chris\CSPN-Baseball\Test-stuff\{team}-batting-{year}.csv',index=False)
+        # Cleaning the data
+        for each_row in all_data:
+            row_header = each_row.find('th')
 
+            if row_header is None:
+                continue
 
+            row_data = each_row.find_all('td')
+            individual_row_data = [data.text.strip() for data in row_data]
 
+            # Skip empty rows
+            if len(individual_row_data) == 0:
+                continue
+            
+            rank = row_header.text.strip()
+
+            # Skip repeated header rows
+            if rank == 'Rk':
+                continue
+
+            individual_row_data.insert(0, rank)
+            # removes the values in the duplicate 'POS' column that appears in the table
+            individual_row_data.pop(-2)
+
+            # To remove pitcher names from coming up in the batting data, we can skip
+            # over any rows that include "P" in the position column (Pos)
+            # Find the position column
+            pos_index = categories.index('Pos')
+
+            # Skip pitchers
+            if individual_row_data[pos_index] == 'P':
+                continue
+
+            # Clean player names
+            player_name = individual_row_data[1]
+
+            player_name = player_name.replace("*", "")
+            player_name = player_name.replace("#", "")
+
+            # Remove anything inside parentheses
+            player_name = player_name.split("(")[0].strip()
+
+            individual_row_data[1] = player_name
+
+            # Add normal rows
+            length = len(team_dataframe)
+            team_dataframe.loc[length] = individual_row_data
+
+        # Adding team and year columns to the dataframe for later use in analysis
+        team_dataframe['Team'] = team
+        team_dataframe['Year'] = year
+
+        # Add the cleaned data to the master list
+        master_list.append(team_dataframe)
+
+        print(f"Finished scraping data for {team} in {year}.")
+
+# Concatenate all the individual team dataframes into a single master dataframe
+master_dataframe = pd.concat(master_list, ignore_index=True)
+# Save the master dataframe to a CSV file
+master_dataframe.to_csv(r'C:\Users\chris\CSPN-Baseball\Test-stuff\batting_data.csv', index=False)   
+
+print("Master dataframe created and saved to CSV file.")
