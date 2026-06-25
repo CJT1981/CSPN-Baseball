@@ -10,7 +10,7 @@ teams = [
     "ARI", "COL", "LAD", "SDP", "SFG", "OAK", "SEA", "HOU", "LAA", "TEX"
     ]
 # creating a list of years to loop through for scraping data from multiple pages
-years = range(2020, 2027)
+years = range(2000, 2027)
 
 master_list = []
 # looping through each team and year to scrape the data and store it in a dataframe, 
@@ -22,6 +22,12 @@ for year in years:
         # fixing error with team abbreviations for OAK
         if team == "OAK" and year >= 2025:
             url_team = "ATH"
+        if team == "LAA" and year <= 2004:
+            url_team = "ANA"
+        if team == "TBR" and year <= 2007:
+            url_team = "TBD"
+        if team == "WSN" and year <= 2004:
+            url_team = "MON"
 
         print(f"Scraping data for {url_team} in {year}...")
 
@@ -99,8 +105,8 @@ for year in years:
             # Remove team totals from data
             if player_name in [
                 'Team Totals',
-                'Pitchers Totals',
-                'Non-Pitchers Totals'
+                'Pitcher Totals',
+                'Non-Pitcher Totals'
             ]:
                 continue
 
