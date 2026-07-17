@@ -64,6 +64,8 @@ for year in years:
         # removes the duplicate 'POS' column that appears in the table
         categories.pop(-2)
 
+        categories.insert(0, 'player_id')  # Insert 'player_id' at the beginning of the categories list
+
         team_dataframe = pd.DataFrame(columns = categories)
 
         # Getting all the table data
@@ -71,16 +73,27 @@ for year in years:
 
         # Cleaning the data
         for each_row in all_data:
+            player_id = None
             row_header = each_row.find('th')
 
             if row_header is None:
                 continue
 
             row_data = each_row.find_all('td')
+
             individual_row_data = [data.text.strip() for data in row_data]
 
             # Skip empty rows
             if len(individual_row_data) == 0:
+                continue
+
+            # To remove pitcher names from coming up in the batting data, we can skip
+            # over any rows that include "P" in the position column (Pos)
+            # Find the position column
+            pos_index = categories.index('Pos')
+            # print(f"Position index: {pos_index}, Position value: {individual_row_data[pos_index-1]}")  # Debugging line
+            # Skip pitchers
+            if individual_row_data[pos_index-1] == 'P':
                 continue
             
             # removes the values in the duplicate 'POS' column that appears in the table
@@ -90,19 +103,9 @@ for year in years:
             if row_header.text.strip() == 'Rk':
                 continue
 
-            # To remove pitcher names from coming up in the batting data, we can skip
-            # over any rows that include "P" in the position column (Pos)
-            # Find the position column
-            pos_index = categories.index('Pos')
-
-            # Skip pitchers
-            if individual_row_data[pos_index] == 'P':
-                continue
-
-            # Clean player names
+            # Remove team totals from data
             player_name = individual_row_data[0]
 
-            # Remove team totals from data
             if player_name in [
                 'Team Totals',
                 'Pitcher Totals',
@@ -110,6 +113,11 @@ for year in years:
             ]:
                 continue
 
+            player_cell = each_row.find('td', {'data-stat': 'name_display'})
+            if player_cell: 
+                player_id = player_cell.get('data-append-csv')
+
+            # Clean player names
             player_name = player_name.replace("*", "")
             player_name = player_name.replace("#", "")
 
@@ -118,8 +126,10 @@ for year in years:
 
             individual_row_data[0] = player_name
 
+            # print(individual_row_data)
             # Add normal rows
             length = len(team_dataframe)
+            individual_row_data.insert(0, player_id)  # Insert player_id at the beginning of the row
             team_dataframe.loc[length] = individual_row_data
 
         # Adding team and year columns to the dataframe for later use in analysis
@@ -129,9 +139,9 @@ for year in years:
         # Reorder the columns to have 'Team' and 'Year' at the front
         columns = team_dataframe.columns.tolist()
 
-        new_order = ['Team', 'Year'] + [
+        new_order = ['player_id', 'Team', 'Year'] + [
             col for col in columns 
-            if col not in ['Team', 'Year']
+            if col not in ['player_id', 'Team', 'Year']
         ]
 
         team_dataframe = team_dataframe[new_order]

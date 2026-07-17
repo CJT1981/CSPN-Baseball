@@ -87,35 +87,18 @@ for year in years:
             if len(individual_row_data) == 0:
                 continue
             
-            # removes the values in the duplicate 'POS' column that appears in the table
-            individual_row_data.pop(-2)
-            
             # Skip repeated header rows
             if row_header.text.strip() == 'Rk':
-                continue
-
-            # To remove pitcher names from coming up in the batting data, we can skip
-            # over any rows that include "P" in the position column (Pos)
-            # Find the position column
-            pos_index = categories.index('Pos')
-
-            # Skip pitchers
-            if individual_row_data[pos_index] == 'P':
                 continue
 
             # Clean player names
             player_name = individual_row_data[0]
 
             # Remove team totals from data
-            if player_name in [
-                'Team Totals',
-                'Pitcher Totals',
-                'Non-Pitcher Totals'
-            ]:
+            if player_name == 'Team Totals':
                 continue
 
             player_name = player_name.replace("*", "")
-            player_name = player_name.replace("#", "")
 
             # Remove anything inside parentheses
             player_name = player_name.split("(")[0].strip()
