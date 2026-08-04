@@ -1,3 +1,6 @@
+"""
+THIS VIEW IS FOR PLAYER PROFILE PAGE
+"""
 DROP VIEW IF EXISTS career_batting;
 
 CREATE VIEW career_batting AS

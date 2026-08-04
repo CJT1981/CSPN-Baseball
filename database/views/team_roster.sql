@@ -7,10 +7,11 @@ SELECT
     Player,
     Team, 
     Year,
-    Pos,
+    Pos,    
     G,
     BA,
     OBP,
     HR,
     RBI,
     WAR
+FROM batting_statistics;

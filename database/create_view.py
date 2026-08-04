@@ -1,8 +1,8 @@
 import sqlite3
-from pathlib import Path
+import Path
+from db_connection import get_connection
 
-DATABASE = "baseball.db"
-_connection = sqlite3.connect(DATABASE)
+_connection = get_connection()
 cursor = _connection.cursor()
 
 views_folder = Path("views")

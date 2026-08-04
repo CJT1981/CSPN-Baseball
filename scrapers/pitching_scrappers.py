@@ -1,5 +1,5 @@
 """
-INCOMPLETED SCRIPT FOR SCRAPING PITCHING DATA FROM BASEBALL-REFERENCE.COM
+COMPLETED SCRIPT FOR SCRAPING PITCHING DATA FROM BASEBALL-REFERENCE.COM
 TAKING A PAUSE FROM WORKING ON THIS SCRIPT FOR NOW. WILL RETURN TO IT LATER.
 """
 
@@ -68,6 +68,8 @@ for year in years:
         # removes Rk column that appears in the table
         categories.pop(0)
 
+        categories.insert(0, 'player_id')  # Insert 'player_id' at the beginning of the categories list
+
         team_dataframe = pd.DataFrame(columns = categories)
 
         # Getting all the table data
@@ -91,12 +93,19 @@ for year in years:
             if row_header.text.strip() == 'Rk':
                 continue
 
+            if float(individual_row_data[14]) < 10.0:
+                continue
+            
             # Clean player names
             player_name = individual_row_data[0]
 
             # Remove team totals from data
             if player_name == 'Team Totals':
                 continue
+
+            player_cell = each_row.find('td', {'data-stat': 'name_display'})
+            if player_cell: 
+                player_id = player_cell.get('data-append-csv')
 
             player_name = player_name.replace("*", "")
 
@@ -107,6 +116,7 @@ for year in years:
 
             # Add normal rows
             length = len(team_dataframe)
+            individual_row_data.insert(0, player_id)  # Insert player_id at the beginning of the row
             team_dataframe.loc[length] = individual_row_data
 
         # Adding team and year columns to the dataframe for later use in analysis
@@ -116,9 +126,9 @@ for year in years:
         # Reorder the columns to have 'Team' and 'Year' at the front
         columns = team_dataframe.columns.tolist()
 
-        new_order = ['Team', 'Year'] + [
+        new_order = ['player_id', 'Team', 'Year'] + [
             col for col in columns 
-            if col not in ['Team', 'Year']
+            if col not in ['player_id', 'Team', 'Year']
         ]
 
         team_dataframe = team_dataframe[new_order]
