@@ -11,9 +11,9 @@ SELECT
     Player,
     SUM(W) AS Wins,
     SUM(L) AS Losses,
-    SUM(ERA) AS CareerERA,
+    AVG(ERA) AS CareerERA,
     SUM(SO) AS Strikeouts,
-    SUM(WHIP) AS CareerWHIP,
+    AVG(WHIP) AS CareerWHIP,
     SUM(WAR) AS CareerWAR
 
 FROM pitching_statistics

@@ -162,3 +162,314 @@ def best_OPS_seasons(start_year, end_year, min_pa = 502):
     connection.close()
     
     return result_df
+
+
+
+def get_player_profile(player_id):
+    """
+    Parameter (str): player_id - The unique identifier for the player.
+    Returns: A pandas DataFrame containing the player's profile information.
+    """
+
+    connection = get_connection()
+    
+    query = """
+        SELECT *
+        FROM player_bio
+        WHERE player_id = ?;
+    """
+    
+    result_df = pd.read_sql_query(query, connection, params=(player_id,))
+    
+    connection.close()
+    
+    return result_df
+
+def get_player_career_batting(player_id):
+    """
+    Parameter (str): player_id - The unique identifier for the player.
+    Returns: A pandas DataFrame containing the player's career batting statistics.
+    """
+
+    connection = get_connection()
+    
+    query = """
+        SELECT *
+        FROM career_batting
+        WHERE player_id = ?
+    """
+    
+    result_df = pd.read_sql_query(query, connection, params=(player_id,))
+    
+    connection.close()
+    
+    return result_df
+
+def get_player_career_pitching(player_id):
+    """
+    Parameter (str): player_id - The unique identifier for the player.
+    Returns: A pandas DataFrame containing the player's career pitching statistics.
+    """
+
+    connection = get_connection()
+    
+    query = """
+        SELECT *
+        FROM career_pitching
+        WHERE player_id = ?
+    """
+    
+    result_df = pd.read_sql_query(query, connection, params=(player_id,))
+    
+    connection.close()
+    
+    return result_df
+
+def get_batting_seasons(player_id):
+    """
+    Parameter (str): player_id - The unique identifier for the player.
+    Returns: A pandas DataFrame containing the player's batting seasons.
+    """
+
+    ALLOWED_STATS = [
+        'player_id',
+        'Team',
+        'Year',
+        'Player',
+        'Age',
+        'Pos',
+        'WAR',
+        'G',
+        'PA',
+        'AB',
+        'R',
+        'H',
+        '2B',
+        '3B',
+        'HR',
+        'RBI',
+        'SB',
+        'CS',
+        'BB',
+        'SO',
+        'BA',
+        'OBP',
+        'SLG',
+        'OPS',
+        'OPS+',
+        'rOBA',
+        'Rbat+',
+        'TB',
+        'GIDP',
+        'HBP',
+        'SH',
+        'SF',
+        'IBB'
+    ]
+
+    connection = get_connection()
+    
+    query = """
+        SELECT *
+        FROM batting_seasons
+        WHERE player_id = ?
+        ORDER BY Year;
+    """
+    
+    result_df = pd.read_sql_query(query, connection, params=(player_id,))
+    
+    connection.close()
+    
+    return result_df
+
+def get_pitching_seasons(player_id):
+    """
+    Parameter (str): player_id - The unique identifier for the player.
+    Returns: A pandas DataFrame containing the player's pitching seasons.
+    """
+
+    connection = get_connection()
+    
+    query = """
+        SELECT *
+        FROM pitching_seasons
+        WHERE player_id = ?
+        ORDER BY Year;
+    """
+    
+    result_df = pd.read_sql_query(query, connection, params=(player_id,))
+    
+    connection.close()
+    
+    return result_df
+
+def get_team_roster(team_name, year):
+    """
+    Parameters:
+    team_name (str): The name of the team.
+    year (int): The year to filter the data.
+    
+    Returns:
+    DataFrame: A pandas DataFrame containing the roster of the specified team for the given year.
+    """
+
+    connection = get_connection()
+    
+    query = """
+        SELECT *
+        FROM team_roster
+        WHERE Team = ? AND Year = ?;
+    """
+    
+    result_df = pd.read_sql_query(query, connection, params=(team_name, year))
+    
+    connection.close()
+    
+    return result_df
+
+def get_batting_leaders(stat, year, min_pa = 502):
+    """
+    Returns the top players for a specified batting statistic in a given year among players with the 
+    qualified number of plate appearances.
+
+    Parameters:
+    stat (str): The batting statistic to filter by (e.g., 'BA', 'HR', 'OPS').
+    year (int): The year to filter the data.
+    min_pa (int): 502 - The minimum number of plate appearances to consider.
+    
+    Returns:
+    DataFrame: A pandas DataFrame containing the top players for the specified statistic.
+    """
+
+    
+    ALLOWED_STATS = [
+        'player_id',
+        'Team',
+        'Year',
+        'Player',
+        'Age',
+        'Pos',
+        'WAR',
+        'G',
+        'PA',
+        'AB',
+        'R',
+        'H',
+        '2B',
+        '3B',
+        'HR',
+        'RBI',
+        'SB',
+        'CS',
+        'BB',
+        'SO',
+        'BA',
+        'OBP',
+        'SLG',
+        'OPS',
+        'OPS+',
+        'rOBA',
+        'Rbat+',
+        'TB',
+        'GIDP',
+        'HBP',
+        'SH',
+        'SF',
+        'IBB'
+    ]
+
+    # This accounts for user input errors, if the user inputs a stat that is not in the allowed stats list, we will raise an error.
+    if stat not in ALLOWED_STATS:
+        raise ValueError("Invalid statistic.")
+
+    connection = get_connection()
+    
+    query = """
+        SELECT Player, Team, ? as stat_value
+        FROM batting_seasons
+        WHERE Year = ? 
+        AND PA >= ?
+        ORDER BY stat_value DESC
+        LIMIT 50;
+    """
+    
+    result_df = pd.read_sql_query(query, connection, params=(stat, year, min_pa))
+    
+    connection.close()
+    
+    return result_df
+
+def get_pitching_leaders(stat, year, min_ip = 162):
+    """
+    Returns the top players for a specified pitching statistic in a given year among players with the 
+    qualified number of innings pitched.
+
+    Parameters:
+    stat (str): The pitching statistic to filter by (e.g., 'ERA', 'SO', 'WHIP').
+    year (int): The year to filter the data.
+    min_ip (int): 162 - The minimum number of innings pitched to consider.
+    
+    Returns:
+    DataFrame: A pandas DataFrame containing the top players for the specified statistic.
+    """
+
+    ALLOWED_STATS = [
+        'player_id',
+        'Team',
+        'Year',
+        'Player',
+        'Age',
+        'Pos',
+        'WAR',
+        'W',
+        'L',
+        'W-L%',
+        'ERA',
+        'G',
+        'GS',
+        'GF',
+        'CG',
+        'SHO',
+        'SV',
+        'IP',
+        'H',
+        'R',
+        'ER',
+        'HR',
+        'BB',
+        'IBB',
+        'SO',
+        'HBP',
+        'BK',
+        'WP',
+        'BF',
+        'ERA+',
+        'FIP',
+        'WHIP',
+        'H9',
+        'HR9',
+        'BB9',
+        'SO9',
+        'SO/BB'
+    ]
+
+    # This accounts for user input errors, if the user inputs a stat that is not in the allowed stats list, we will raise an error.
+    if stat not in ALLOWED_STATS:
+        raise ValueError("Invalid statistic.")
+
+    connection = get_connection()
+    
+    query = """
+        SELECT Player, Team, ? as stat_value
+        FROM pitching_seasons
+        WHERE Year = ? 
+        AND IP >= ?
+        ORDER BY stat_value DESC
+        LIMIT 50;
+    """
+    
+    result_df = pd.read_sql_query(query, connection, params=(stat, year, min_ip))
+    
+    connection.close()
+    
+    return result_df

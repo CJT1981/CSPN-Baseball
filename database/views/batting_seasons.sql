@@ -1,18 +1,14 @@
-"""
-THESE VIEWS ARE WORKING AS DATA PROVIDERS FOR DIFFERENT PAGES IN THE APP
+DROP VIEW IF EXISTS batting_seasons;
 
-THIS VIEW IS FOR BATTLING LEADERBOARD PAGE
-"""
-
-DROP VIEW IF EXISTS batting_leaderboard;
-
-CREATE VIEW batting_leaderboard AS
+CREATE VIEW batting_seasons AS
 
 SELECT
     player_id,
     Team,
     Year,
     Player,
+    Age,
+    Pos,
     WAR,
     G,
     PA,
@@ -32,9 +28,12 @@ SELECT
     SLG,
     OPS,
     OPS+,
+    rOBA,
+    Rbat+,
     TB,
     GIDP,
     HBP,
+    SH,
+    SF,
     IBB
-
-FROM batting_statistics
+FROM batting_statistics;

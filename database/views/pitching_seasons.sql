@@ -1,19 +1,18 @@
-"""
-THIS VIEW IS FOR PITCHING LEADERBOARD PAGE
-"""
+DROP VIEW IF EXISTS pitching_seasons;
 
-DROP VIEW IF EXISTS pitching_leaderboard;
-
-CREATE VIEW pitching_leaderboard AS
+CREATE VIEW pitching_seasons AS
 
 SELECT
     player_id,
     Team,
     Year,
     Player,
+    Age,
+    Pos,
     WAR,
     W,
     L,
+    W-L%,
     ERA,
     G,
     GS,
@@ -27,8 +26,12 @@ SELECT
     ER,
     HR,
     BB,
+    IBB,
     SO,
     HBP,
+    BK,
+    WP,
+    BF,
     ERA+,
     FIP,
     WHIP,
@@ -37,4 +40,5 @@ SELECT
     BB9,
     SO9,
     SO/BB
-FROM pitching_statistics
+
+FROM pitching_statistics;

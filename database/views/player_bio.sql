@@ -1,6 +1,10 @@
-DROP VIEW IF EXISTS player_summary;
+"""
+THIS VIEW IS FOR PLAYER PROFILE PAGE
+"""
 
-CREATE VIEW player_summary AS 
+DROP VIEW IF EXISTS player_bio;
+
+CREATE VIEW player_bio AS 
 
 SELECT
 
