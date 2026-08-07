@@ -163,8 +163,6 @@ def best_OPS_seasons(start_year, end_year, min_pa = 502):
     
     return result_df
 
-
-
 def get_player_profile(player_id):
     """
     Parameter (str): player_id - The unique identifier for the player.
@@ -230,42 +228,6 @@ def get_batting_seasons(player_id):
     Parameter (str): player_id - The unique identifier for the player.
     Returns: A pandas DataFrame containing the player's batting seasons.
     """
-
-    ALLOWED_STATS = [
-        'player_id',
-        'Team',
-        'Year',
-        'Player',
-        'Age',
-        'Pos',
-        'WAR',
-        'G',
-        'PA',
-        'AB',
-        'R',
-        'H',
-        '2B',
-        '3B',
-        'HR',
-        'RBI',
-        'SB',
-        'CS',
-        'BB',
-        'SO',
-        'BA',
-        'OBP',
-        'SLG',
-        'OPS',
-        'OPS+',
-        'rOBA',
-        'Rbat+',
-        'TB',
-        'GIDP',
-        'HBP',
-        'SH',
-        'SF',
-        'IBB'
-    ]
 
     connection = get_connection()
     
@@ -343,12 +305,6 @@ def get_batting_leaders(stat, year, min_pa = 502):
 
     
     ALLOWED_STATS = [
-        'player_id',
-        'Team',
-        'Year',
-        'Player',
-        'Age',
-        'Pos',
         'WAR',
         'G',
         'PA',
@@ -414,12 +370,6 @@ def get_pitching_leaders(stat, year, min_ip = 162):
     """
 
     ALLOWED_STATS = [
-        'player_id',
-        'Team',
-        'Year',
-        'Player',
-        'Age',
-        'Pos',
         'WAR',
         'W',
         'L',
@@ -453,6 +403,23 @@ def get_pitching_leaders(stat, year, min_ip = 162):
         'SO/BB'
     ]
 
+    ascending_stats = [
+        'ERA', 
+        'H',
+        'R',
+        'ER',
+        'HR',
+        'BB',
+        'WHIP', 
+        'H9',
+        'HR9',
+        'BB9'
+    ]
+
+    direction = 'DESC'
+    if stat in ascending_stats:
+        direction = 'ASC'
+
     # This accounts for user input errors, if the user inputs a stat that is not in the allowed stats list, we will raise an error.
     if stat not in ALLOWED_STATS:
         raise ValueError("Invalid statistic.")
@@ -464,12 +431,92 @@ def get_pitching_leaders(stat, year, min_ip = 162):
         FROM pitching_seasons
         WHERE Year = ? 
         AND IP >= ?
-        ORDER BY stat_value DESC
+        ORDER BY stat_value ?
         LIMIT 50;
     """
     
-    result_df = pd.read_sql_query(query, connection, params=(stat, year, min_ip))
+    result_df = pd.read_sql_query(query, connection, params=(stat, year, min_ip, direction))
     
     connection.close()
     
+    return result_df
+
+def get_player_search(user_input):
+    """
+    parameter (str): user_input - The input string to search for in player names.
+    returns: A pandas DataFrame containing the players that match the search criteria.
+    """
+
+    connection = get_connection()
+
+    query = """
+        SELECT
+            player_id,
+            player_name
+        FROM player_bio
+        WHERE player_name LIKE ?
+        ORDER BY player_name;
+        """
+
+    result_df = pd.read_sql_query(query, connection, params=(user_input))
+
+    connection.close()
+
+    return result_df
+
+def get_team(team_id, year_id):
+    """
+    parameter (str): team_id - The ID of the team to search for.
+    parameter (int): year_id - The year to filter the data.
+    returns: A pandas DataFrame containing the team information for the specified year.
+    """
+
+    connection = get_connection()
+
+    query = """
+        SELECT 
+            year_id,
+            team_name,
+            league,
+            division,
+            number_of_games,
+            wins,
+            losses,
+            ties,
+            winning_percentage,
+            finish,
+            playoff_result
+        FROM franchise_history
+        WHERE team_id = ? AND year_id = ?;
+        """
+
+    result_df = pd.read_sql_query(query, connection, params=(team_id, year_id))
+
+    connection.close()
+
+    return result_df
+
+def get_team_roster(team_id, year_id):
+    """
+    parameter (str): team_id - The ID of the team to search for.
+    parameter (int): year_id - The year to filter the data.
+    returns: A pandas DataFrame containing the team roster for the specified year.
+    """
+
+    connection = get_connection()
+
+    query = """
+        SELECT 
+            player_id,
+            player_name,
+            position,
+            games_played
+        FROM team_roster
+        WHERE Team = ? AND Year = ?;
+        """
+
+    result_df = pd.read_sql_query(query, connection, params=(team_id, year_id))
+
+    connection.close()
+
     return result_df
