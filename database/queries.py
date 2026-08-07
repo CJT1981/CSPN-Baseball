@@ -265,30 +265,6 @@ def get_pitching_seasons(player_id):
     
     return result_df
 
-def get_team_roster(team_name, year):
-    """
-    Parameters:
-    team_name (str): The name of the team.
-    year (int): The year to filter the data.
-    
-    Returns:
-    DataFrame: A pandas DataFrame containing the roster of the specified team for the given year.
-    """
-
-    connection = get_connection()
-    
-    query = """
-        SELECT *
-        FROM team_roster
-        WHERE Team = ? AND Year = ?;
-    """
-    
-    result_df = pd.read_sql_query(query, connection, params=(team_name, year))
-    
-    connection.close()
-    
-    return result_df
-
 def get_batting_leaders(stat, year, min_pa = 502):
     """
     Returns the top players for a specified batting statistic in a given year among players with the 

@@ -13,7 +13,7 @@ SELECT
     SUM(HR) AS HomeRuns,
     SUM(RBI) AS RBIs,
     SUM(WAR) AS CareerWAR,
-    SUM(H)/SUM(AB) AS CareerAVG
+    AVG(BA) AS CareerAVG
 
 FROM batting_statistics
 GROUP BY 
