@@ -1,6 +1,6 @@
-"""
+/*
 THIS VIEW IS FOR TEAM ROSTER PAGE
-"""
+*/
 
 DROP VIEW IF EXISTS team_roster;
 

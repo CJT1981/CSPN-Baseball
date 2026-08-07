@@ -1,3 +1,8 @@
+/*
+This page will be used for player pitching statistics for each season. 
+It will be used to display the player's pitching statistics for each season in the app.
+*/
+
 DROP VIEW IF EXISTS pitching_seasons;
 
 CREATE VIEW pitching_seasons AS
@@ -12,7 +17,7 @@ SELECT
     WAR,
     W,
     L,
-    W-L%,
+    "W-L%",
     ERA,
     G,
     GS,
@@ -32,13 +37,13 @@ SELECT
     BK,
     WP,
     BF,
-    ERA+,
+    "ERA+",
     FIP,
     WHIP,
     H9,
     HR9,
     BB9,
     SO9,
-    SO/BB
+    "SO/BB"
 
 FROM pitching_statistics;

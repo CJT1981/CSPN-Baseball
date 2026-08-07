@@ -1,6 +1,6 @@
-"""
+/*
 THIS VIEW IS FOR PLAYER PROFILE PAGE
-"""
+*/
 DROP VIEW IF EXISTS career_pitching;
 
 CREATE VIEW career_pitching AS

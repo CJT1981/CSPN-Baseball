@@ -1,5 +1,5 @@
 import sqlite3
-import Path
+from pathlib import Path
 from db_connection import get_connection
 
 _connection = get_connection()
@@ -13,7 +13,13 @@ for sql_file in views_folder.glob("*.sql"):
     with open(sql_file, 'r', encoding='utf-8') as _file:
         sql_script = _file.read()
 
-    cursor.executescript(sql_script)
+    try:
+        cursor.executescript(sql_script)
+        print(f"{sql_file.name} view created successfully.")
+
+    except sqlite3.Error as e:
+        print(f"Error occurred while creating view from {sql_file.name}: {e}")
+        break  # Stop processing further if an error occurs
 
 _connection.commit()
 _connection.close()

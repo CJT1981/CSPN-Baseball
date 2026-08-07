@@ -1,6 +1,6 @@
-"""
+/*
 THIS VIEW IS FOR PLAYER PROFILE PAGE
-"""
+*/
 
 DROP VIEW IF EXISTS player_bio;
 
@@ -15,6 +15,6 @@ SELECT
     p.weight,
     p.birth_date,
     p.bats,
-    p.throws,
+    p.throws
 
 FROM player_profiles p;

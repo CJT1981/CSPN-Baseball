@@ -1,8 +1,8 @@
-"""
+/*
 THESE VIEWS ARE WORKING AS DATA PROVIDERS FOR DIFFERENT PAGES IN THE APP
 
 THIS VIEW IS FOR BATTLING LEADERBOARD PAGE
-"""
+*/
 
 DROP VIEW IF EXISTS batting_leaderboard;
 
@@ -19,8 +19,8 @@ SELECT
     AB,
     R,
     H,
-    2B,
-    3B,
+    "2B",
+    "3B",
     HR,
     RBI,
     SB,
@@ -31,10 +31,10 @@ SELECT
     OBP,
     SLG,
     OPS,
-    OPS+,
+    "OPS+",
     TB,
     GIDP,
     HBP,
     IBB
 
-FROM batting_statistics
+FROM batting_statistics;

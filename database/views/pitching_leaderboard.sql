@@ -1,6 +1,6 @@
-"""
+/*
 THIS VIEW IS FOR PITCHING LEADERBOARD PAGE
-"""
+*/
 
 DROP VIEW IF EXISTS pitching_leaderboard;
 
@@ -29,12 +29,12 @@ SELECT
     BB,
     SO,
     HBP,
-    ERA+,
+    "ERA+",
     FIP,
     WHIP,
     H9,
     HR9,
     BB9,
     SO9,
-    SO/BB
-FROM pitching_statistics
+    "SO/BB"
+FROM pitching_statistics;
