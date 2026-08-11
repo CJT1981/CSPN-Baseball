@@ -1,4 +1,5 @@
-from db_connection import get_connection
+from database.db_connection import get_connection
+# from db_connection import get_connection
 import pandas as pd 
 
 # This stores my reusable SQL functions 
@@ -173,8 +174,8 @@ def get_player_profile(player_id):
     
     query = """
         SELECT *
-        FROM player_bio
-        WHERE player_id = ?;
+        FROM player_profiles
+        WHERE player_id = ?
     """
     
     result_df = pd.read_sql_query(query, connection, params=(player_id,))
