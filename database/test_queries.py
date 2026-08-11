@@ -79,16 +79,19 @@ print(team)
 
 print("\n")
 
-"""
 print("=" * 25)
 print("TESTING TEAM ROSTER")
 print("=" * 25)
 
-roster = get_team_roster("LAD", 2023)
-print(roster.head())
+batting_roster, pitching_roster = get_team_roster("LAD", 2023)
+print("POSITION PLAYERS")
+print(batting_roster)
+print("PITCHING PLAYERS")
+print(pitching_roster)
 
 print("\n")
 
+"""
 print("=" * 25)
 print("TESTING PLAYER SEARCH")
 print("=" * 25)
@@ -103,7 +106,7 @@ print("TESTING BATTING LEADERS")
 print("=" * 25)
 
 leaders = get_batting_leaders("HR", 2023)
-print(leaders.head(10))
+print(leaders)
 
 print("\n")
 
@@ -112,4 +115,4 @@ print("TESTING PITCHING LEADERS")
 print("=" * 25)
 
 leaders = get_pitching_leaders("SO", 2023)
-print(leaders.head(10))
+print(leaders)

@@ -316,17 +316,16 @@ def get_batting_leaders(stat, year, min_pa = 502):
 
     connection = get_connection()
     
-    query = """
-        SELECT Player, Team, ? as stat_value
+    query = f"""
+        SELECT Player, Team, {stat} as stat_value
         FROM batting_seasons
         WHERE Year = ? 
         AND PA >= ?
-        ORDER BY stat_value DESC
+        ORDER BY {stat} DESC
         LIMIT 50;
     """
     
-    result_df = pd.read_sql_query(query, connection, params=(stat, year, min_pa))
-    
+    result_df = pd.read_sql_query(query, connection, params=(year, min_pa))
     connection.close()
     
     return result_df
@@ -392,26 +391,26 @@ def get_pitching_leaders(stat, year, min_ip = 162):
         'BB9'
     ]
 
-    direction = 'DESC'
-    if stat in ascending_stats:
-        direction = 'ASC'
-
     # This accounts for user input errors, if the user inputs a stat that is not in the allowed stats list, we will raise an error.
     if stat not in ALLOWED_STATS:
         raise ValueError("Invalid statistic.")
 
+    direction = 'DESC'
+    if stat in ascending_stats:
+        direction = 'ASC'
+
     connection = get_connection()
     
-    query = """
-        SELECT Player, Team, ? as stat_value
+    query = f"""
+        SELECT Player, Team, [{stat}] as stat_value
         FROM pitching_seasons
         WHERE Year = ? 
         AND IP >= ?
-        ORDER BY stat_value ?
+        ORDER BY [{stat}] {direction}
         LIMIT 50;
     """
     
-    result_df = pd.read_sql_query(query, connection, params=(stat, year, min_ip, direction))
+    result_df = pd.read_sql_query(query, connection, params=(year, min_ip))
     
     connection.close()
     
@@ -484,15 +483,27 @@ def get_team_roster(team_id, year_id):
     query = """
         SELECT 
             player_id,
-            player_name,
-            position,
-            games_played
-        FROM team_roster
+            Player,
+            Pos,
+            G
+        FROM batting_seasons
         WHERE Team = ? AND Year = ?;
         """
 
-    result_df = pd.read_sql_query(query, connection, params=(team_id, year_id))
+    batting_team_df = pd.read_sql_query(query, connection, params=(team_id, year_id))
+
+    query = """
+        SELECT
+            player_id,
+            Player,
+            Pos,
+            G
+        FROM pitching_seasons
+        WHERE Team = ? AND Year = ?;
+    """
+
+    pitching_team_df = pd.read_sql_query(query, connection, params=(team_id, year_id))
 
     connection.close()
 
-    return result_df
+    return batting_team_df, pitching_team_df
