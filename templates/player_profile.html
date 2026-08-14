@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en"> 
+    <head>
+
+        <!-- 
+        We are set the charset to UTF-8 characters so the browser can display names correctly
+        such as Andrés and Acuña
+        -->
+        <meta charset="UTF-8"> 
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- 
+        For the title we want to pull the player's name from the query
+        -->
+        <title>{{ profile.iloc[0]['player_name'] }} | CSPN Baseball</title>
+
+        <!--
+        Here is where we load our CSS files: app_style.css and player_profile.css
+            app_style - styling that is shared across the entire app
+            player_profile - styling specific for this profile page        
+        -->
+        
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/app_style.css')}}">
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/player_profile.css')}}">
+        
+    </head>
+
+    <body>
+    
+    <!--
+    NAVIGATION BAR
+    -->
+    <nav class="navbar">
+
+        <!--
+            I want the CSPN Baseball Logo to have functionality, where if the user presses the 
+            logo it will take the user back to the home page of the app
+        -->
+        <a href="{{ url_for('home') }}" class="nav-logo">
+            CSPN Baseball
+        </a>
+
+        <!-- 
+            Navigation links.
+            We will need to add more links later such as batting leaders, pitching leaders,
+            teams, etc.
+        -->
+        
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <!-- 
+                We will add more routes later
+            -->
+        </div>
+
+    </nav>
+    
+    <!--
+        MAIN PAGE
+    -->
+    <main class="player-page">
+        <!--
+            PLAYER HEADER
+        -->
+        <section class="player-header">
+            <!-- This part is for the player's name, ex. Barry Bonds, 
+                 as well as their primary position, ex. Leftfielder
+            -->
+             <h1>
+                {{ profile.iloc[0]['player_name'] }}
+             </h1>
+
+             <p class="player-position">
+                {{ profile.iloc[0]['position'] }}
+             </p>
+
+        </section>
+        
+        <!-- 
+            PLAYER BIO INFORMATION
+        -->
+        <section class="profile-card">
+            <h2>Player Information</h2>
+            <div class="profile-grid">
+                <!-- POSITION -->
+                <div class="profile-item">
+                    <span class="profile-label">
+                        Position
+                    </span>
+                    <span class="profile-value">
+                        {{ profile.iloc[0]['position'] }}
+                    </span>
+                </div>
+                <!-- BATS -->
+                <div class="profile-item">
+                    <span class="profile-label">
+                        Bats
+                    </span>
+                    <span class="profile-value">
+                        {{ profile.iloc[0]['bats'] }}
+                    </span>
+                </div>
+                <!-- THROWS -->
+                <div class="profile-item">
+                    <span class="profile-label">
+                        Throws
+                    </span>
+                    <span class="profile-value">
+                        {{ profile.iloc[0]['throws'] }}
+                    </span>
+                </div>
+                <!-- HEIGHT -->
+                <div class="profile-item">
+                    <span class="profile-label">
+                        Height
+                    </span>
+                    <span class="profile-value">
+                        {{ profile.iloc[0]['height'] }}
+                    </span>
+                </div>
+                <!-- WEIGHT -->
+                <div class="profile-item">
+                    <span class="profile-label">
+                        Weight
+                    </span>
+                    <span class="profile-value">
+                        {{ profile.iloc[0]['weight'] }}
+                    </span>
+                </div>
+                <!-- BIRTH DATE -->
+                <div class="profile-item">
+                    <span class="profile-label">
+                        Birth Date
+                    </span>
+                    <span class="profile-value">
+                        {{ profile.iloc[0]['birth_date'] }}
+                    </span>
+                </div>
+                <!-- MLB DEBUT -->
+                <div class="profile-item">
+                    <span class="profile-label">
+                        MLB Debut
+                    </span>
+                    <span class="profile-value">
+                        {{ profile.iloc[0]['debut'] }}
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- CAREER STATISTICS -->
+        <section class="stats-card">
+            <h2>Career Statistics</h2>
+            
+        </section>
+    </main>
+
+
+
+</html>

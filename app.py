@@ -16,9 +16,23 @@ def player_profile(player_id):
     if profile_data.empty:
         return "Player not found", 404
     
-    player_career_stats = ''
-    player_seasons = ''
 
+    # Some of our columns like 2B and 3B aren't handled cleanly by python 
+    # Therefore we convert our data into a dictionary to better handle our
+    # data 
+    profile = profile_data.iloc[0].to_dict()
+    player_career_df = get_player_career_batting(player_id)
+    player_season_df = get_batting_seasons(player_id)
+
+    player_season_stats = player_season_df.to_dict('records')
+
+    player_career_stats = None
+
+    if not player_career_df.empty:
+        player_career_stats = player_career_df.iloc[0].to_dict()
+
+    
+    """
     # Because we pulled a whole Panda series, we need to pull the position from the 
     # series to determine if we need to pull pitching or batting stats.
     # Here is where we pull the position:
@@ -32,12 +46,12 @@ def player_profile(player_id):
     else:
         player_career_stats = get_player_career_batting(player_id)
         player_seasons = get_batting_seasons(player_id)
-
+    """
     return render_template(
         "player_profile.html",
         profile_data=profile_data,
         player_career_stats=player_career_stats,
-        player_seasons=player_seasons
+        player_seasons=player_season_stats
 
     )
 
