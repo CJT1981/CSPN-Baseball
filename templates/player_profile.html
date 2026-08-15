@@ -152,7 +152,63 @@
         <!-- CAREER STATISTICS -->
         <section class="stats-card">
             <h2>Career Statistics</h2>
-            
+            {% if not player_career_stats.empty %}
+            <!-- 
+                We use a table to handle the career statistics quite a few categories
+            -->
+                <div class="table-container">
+                    <table class="stats-table">
+                        <tr>
+                            <th>G</th>
+                            <th>H</th>
+                            <th>2B</th>
+                            <th>3B</th>
+                            <th>HR</th>
+                            <th>RBI</th>
+                            <th>BA</th>
+                            <th>OBP</th>
+                            <th>SLG</th>
+                            <th>OPS</th>
+                            <th>WAR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for _, row in player_career_stats.itterrows() %}
+                        <tr>
+                            <td>{{ row['G'] }}</td>
+                            <td>{{ row['H'] }}</td>
+                            <td>{{ row['2B'] }}</td>
+                            <td>{{ row['3B'] }}</td>
+                            <td>{{ row['HR'] }}</td>
+                            <td>{{ row['RBI'] }}</td>
+                            <td>{{ row['BA'] }}</td>
+                            <td>{{ row['OBP'] }}</td>
+                            <td>{{ row['SLG'] }}</td>
+                            <td>{{ row['OPS'] }}</td>
+                            <td>{{ row['WAR'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </div>
+            </table>
+            {% else %}
+            <!-- 
+            In case the player doesn't have career statistics in the database
+            -->
+
+                <p class="no-data">
+                    No career statistics available.
+                </p>
+            {% endif %}
+        </section>
+
+        <!-- 
+        SEASON BY SEASON STATISTICS
+        -->
+        <section class="stats=card">
+            <h2>Season Statistics</h2>
+
+            {% if not player_season_stats.empty %}
         </section>
     </main>
 
