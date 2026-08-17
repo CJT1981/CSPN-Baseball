@@ -12,7 +12,7 @@
         <!-- 
         For the title we want to pull the player's name from the query
         -->
-        <title>{{ profile.iloc[0]['player_name'] }} | CSPN Baseball</title>
+        <title>{{ profile['player_name'] }} | CSPN Baseball</title>
 
         <!--
         Here is where we load our CSS files: app_style.css and player_profile.css
@@ -68,11 +68,11 @@
                  as well as their primary position, ex. Leftfielder
             -->
              <h1>
-                {{ profile.iloc[0]['player_name'] }}
+                {{ profile['player_name'] }}
              </h1>
 
              <p class="player-position">
-                {{ profile.iloc[0]['position'] }}
+                {{ profile['position'] }}
              </p>
 
         </section>
@@ -89,7 +89,7 @@
                         Position
                     </span>
                     <span class="profile-value">
-                        {{ profile.iloc[0]['position'] }}
+                        {{ profile['position'] }}
                     </span>
                 </div>
                 <!-- BATS -->
@@ -98,7 +98,7 @@
                         Bats
                     </span>
                     <span class="profile-value">
-                        {{ profile.iloc[0]['bats'] }}
+                        {{ profile['bats'] }}
                     </span>
                 </div>
                 <!-- THROWS -->
@@ -107,7 +107,7 @@
                         Throws
                     </span>
                     <span class="profile-value">
-                        {{ profile.iloc[0]['throws'] }}
+                        {{ profile['throws'] }}
                     </span>
                 </div>
                 <!-- HEIGHT -->
@@ -116,7 +116,7 @@
                         Height
                     </span>
                     <span class="profile-value">
-                        {{ profile.iloc[0]['height'] }}
+                        {{ profile['height'] }}
                     </span>
                 </div>
                 <!-- WEIGHT -->
@@ -125,7 +125,7 @@
                         Weight
                     </span>
                     <span class="profile-value">
-                        {{ profile.iloc[0]['weight'] }}
+                        {{ profile['weight'] }}
                     </span>
                 </div>
                 <!-- BIRTH DATE -->
@@ -134,7 +134,7 @@
                         Birth Date
                     </span>
                     <span class="profile-value">
-                        {{ profile.iloc[0]['birth_date'] }}
+                        {{ profile['birth_date'] }}
                     </span>
                 </div>
                 <!-- MLB DEBUT -->
@@ -143,7 +143,7 @@
                         MLB Debut
                     </span>
                     <span class="profile-value">
-                        {{ profile.iloc[0]['debut'] }}
+                        {{ profile['debut'] }}
                     </span>
                 </div>
             </div>
@@ -158,34 +158,36 @@
             -->
                 <div class="table-container">
                     <table class="stats-table">
-                        <tr>
-                            <th>G</th>
-                            <th>H</th>
-                            <th>2B</th>
-                            <th>3B</th>
-                            <th>HR</th>
-                            <th>RBI</th>
-                            <th>BA</th>
-                            <th>OBP</th>
-                            <th>SLG</th>
-                            <th>OPS</th>
-                            <th>WAR</th>
-                        </tr>
-                    </thead>
+                        <thead>
+                            <tr>
+                                <th>G</th>
+                                <th>H</th>
+                                <th>2B</th>
+                                <th>3B</th>
+                                <th>HR</th>
+                                <th>RBI</th>
+                                <th>BA</th>
+                                <th>OBP</th>
+                                <th>SLG</th>
+                                <th>OPS</th>
+                                <th>WAR</th>
+                            </tr>
+                        </thead>
+                    </table>
                     <tbody>
-                        {% for _, row in player_career_stats.itterrows() %}
+                        {% for _, row in player_career_stats.iterrows() %}
                         <tr>
-                            <td>{{ row['G'] }}</td>
-                            <td>{{ row['H'] }}</td>
-                            <td>{{ row['2B'] }}</td>
-                            <td>{{ row['3B'] }}</td>
-                            <td>{{ row['HR'] }}</td>
-                            <td>{{ row['RBI'] }}</td>
-                            <td>{{ row['BA'] }}</td>
-                            <td>{{ row['OBP'] }}</td>
-                            <td>{{ row['SLG'] }}</td>
-                            <td>{{ row['OPS'] }}</td>
-                            <td>{{ row['WAR'] }}</td>
+                            <td>{{ row['cG'] }}</td>
+                            <td>{{ row['cHits'] }}</td>
+                            <td>{{ row['cDoubles'] }}</td>
+                            <td>{{ row['cTriples'] }}</td>
+                            <td>{{ row['cHomeRuns'] }}</td>
+                            <td>{{ row['cRBIs'] }}</td>
+                            <td>{{ row['cAVG'] }}</td>
+                            <td>{{ row['cOBP'] }}</td>
+                            <td>{{ row['cSLG'] }}</td>
+                            <td>{{ row['cOPS'] }}</td>
+                            <td>{{ row['cWAR'] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -209,9 +211,85 @@
             <h2>Season Statistics</h2>
 
             {% if not player_season_stats.empty %}
+                <div class="table-container">
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Team</th>
+                                <th>G</th>
+                                <th>BA</th>
+                                <th>HR</th>
+                                <th>RBI</th>
+                                <th>OBP</th>
+                                <th>SLG</th>
+                                <th>OPS</th>
+                                <th>H</th>
+                                <th>2B</th>
+                                <th>3B</th>
+                                <th>R</th>
+                                <th>AB</th>
+                                <th>BB</th>
+                                <th>PA</th>
+                                <th>SB</th>
+                                <th>TB</th>
+                                <th>HBP</th>
+                                <th>IBB</th>
+                                <th>SF</th>
+                                <th>SH</th>
+                                <th>CS</th>
+                                <th>SO</th>
+                                <th>GIDP</th>
+                                <th>rOBA</th>
+                                <th>Rbat+</th>
+                                <th>OPS+</th>
+                                <th>WAR</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for _, row in player_season_stats.iterrows() %}
+                            <tr>
+                                <td>{{ row['Year'] }}</td>
+                                <td>{{ row['Team'] }}</td>
+                                <td>{{ row['G'] }}</td>
+                                <td>{{ row['BA'] }}</td>
+                                <td>{{ row['HR'] }}</td>
+                                <td>{{ row['RBI'] }}</td>
+                                <td>{{ row['OBP'] }}</td>
+                                <td>{{ row['SLG'] }}</td>
+                                <td>{{ row['OPS'] }}</td>
+                                <td>{{ row['H'] }}</td>
+                                <td>{{ row['2B'] }}</td>
+                                <td>{{ row['3B'] }}</td>
+                                <td>{{ row['R'] }}</td>
+                                <td>{{ row['AB'] }}</td>
+                                <td>{{ row['BB'] }}</td>
+                                <td>{{ row['PA'] }}</td>
+                                <td>{{ row['SB'] }}</td>
+                                <td>{{ row['TB'] }}</td>
+                                <td>{{ row['HBP'] }}</td>
+                                <td>{{ row['IBB'] }}</td>
+                                <td>{{ row['SF'] }}</td>
+                                <td>{{ row['SH'] }}</td>
+                                <td>{{ row['CS'] }}</td>
+                                <td>{{ row['SO'] }}</td>
+                                <td>{{ row['rOBA'] }}</td>
+                                <td>{{ row['Rbat+'] }}</td>
+                                <td>{{ row['OPS+'] }}</td>
+                                <td>{{ row['WAR'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="no-data">
+                    No season statistics available.
+                </p>
+            {% endif %}
         </section>
     </main>
-
-
+</body>
 
 </html>

@@ -10,48 +10,40 @@ def home():
 # Creating a route for the player profile page
 @app.route('/player/<player_id>')
 def player_profile(player_id):
+    # TEST #3:
+
+    # GET PLAYER PROFILE
     profile_data = get_player_profile(player_id)
 
     # If there is no profile data, return a 404 error page
     if profile_data.empty:
         return "Player not found", 404
-    
 
-    # Some of our columns like 2B and 3B aren't handled cleanly by python 
-    # Therefore we convert our data into a dictionary to better handle our
-    # data 
+    # DETERMINE IF PLAYER IS A PITCHER OR NON-PITCHER
     profile = profile_data.iloc[0].to_dict()
-    player_career_df = get_player_career_batting(player_id)
-    player_season_df = get_batting_seasons(player_id)
-
-    player_season_stats = player_season_df.to_dict('records')
-
-    player_career_stats = None
-
-    if not player_career_df.empty:
-        player_career_stats = player_career_df.iloc[0].to_dict()
-
     
-    """
     # Because we pulled a whole Panda series, we need to pull the position from the 
     # series to determine if we need to pull pitching or batting stats.
     # Here is where we pull the position:
-    position = profile_data.iloc[0]['position']
+    position = profile['position']
+
+    player_season_stats = None
 
     # Here is where we determine if the player is a pitcher or not, 
     # and then pull the appropriate stats.
-    if 'Pitcher' in position:
+    if 'Pitcher' in position or 'P' in position:
         player_career_stats = get_player_career_pitching(player_id)
-        player_seasons = get_pitching_seasons(player_id)
+        player_season_stats = get_pitching_seasons(player_id)
     else:
         player_career_stats = get_player_career_batting(player_id)
-        player_seasons = get_batting_seasons(player_id)
-    """
+        player_season_stats = get_batting_seasons(player_id)
+
+    # SEND OUR DATA TO HTML
     return render_template(
         "player_profile.html",
-        profile_data=profile_data,
+        profile=profile,
         player_career_stats=player_career_stats,
-        player_seasons=player_season_stats
+        player_season_stats=player_season_stats
 
     )
 

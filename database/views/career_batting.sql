@@ -9,11 +9,17 @@ SELECT
 
     player_id,
     Player,
-    SUM(H) AS Hits,
-    SUM(HR) AS HomeRuns,
-    SUM(RBI) AS RBIs,
-    SUM(WAR) AS CareerWAR,
-    AVG(BA) AS CareerAVG
+    SUM(G) AS cG,
+    SUM(H) AS cHits,
+    SUM(HR) AS cHomeRuns,
+    SUM('2B') AS cDoubles,
+    SUM('3B') AS cTriples,
+    SUM(RBI) AS cRBIs,
+    SUM(WAR) AS cWAR,
+    AVG(BA) AS cAVG,
+    AVG(OBP) AS cOBP,
+    AVG(SLG) AS cSLG,
+    AVG(OPS) AS cOPS
 
 FROM batting_statistics
 GROUP BY 
