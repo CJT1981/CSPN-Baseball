@@ -37,6 +37,12 @@ def player_profile(player_id):
     else:
         player_career_stats = get_player_career_batting(player_id)
         player_season_stats = get_batting_seasons(player_id)
+        """
+        print("========== CAREER STATS ==========")
+        print(player_career_stats)
+        print("Is empty:", player_career_stats.empty)
+        print("Columns:", player_career_stats.columns.tolist())
+        print("==================================")"""
 
     # SEND OUR DATA TO HTML
     return render_template(

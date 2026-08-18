@@ -173,26 +173,26 @@
                                 <th>WAR</th>
                             </tr>
                         </thead>
+                        
+                        <tbody>
+                            {% for _, row in player_career_stats.iterrows() %}
+                            <tr>
+                                <td>{{ row['G'] }}</td>
+                                <td>{{ row['H'] }}</td>
+                                <td>{{ row['2B'] }}</td>
+                                <td>{{ row['3B'] }}</td>
+                                <td>{{ row['HR'] }}</td>
+                                <td>{{ row['RBI'] }}</td>
+                                <td>{{ "%.3f"|format(row['BA']) }}</td>
+                                <td>{{ "%.3f"|format(row['OBP']) }}</td>
+                                <td>{{ "%.3f"|format(row['SLG']) }}</td>
+                                <td>{{ "%.3f"|format(row['OPS']) }}</td>
+                                <td>{{ "%.1f"|format(row['WAR']) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
-                    <tbody>
-                        {% for _, row in player_career_stats.iterrows() %}
-                        <tr>
-                            <td>{{ row['cG'] }}</td>
-                            <td>{{ row['cHits'] }}</td>
-                            <td>{{ row['cDoubles'] }}</td>
-                            <td>{{ row['cTriples'] }}</td>
-                            <td>{{ row['cHomeRuns'] }}</td>
-                            <td>{{ row['cRBIs'] }}</td>
-                            <td>{{ row['cAVG'] }}</td>
-                            <td>{{ row['cOBP'] }}</td>
-                            <td>{{ row['cSLG'] }}</td>
-                            <td>{{ row['cOPS'] }}</td>
-                            <td>{{ row['cWAR'] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
                 </div>
-            </table>
             {% else %}
             <!-- 
             In case the player doesn't have career statistics in the database
@@ -207,7 +207,7 @@
         <!-- 
         SEASON BY SEASON STATISTICS
         -->
-        <section class="stats=card">
+        <section class="stats-card">
             <h2>Season Statistics</h2>
 
             {% if not player_season_stats.empty %}
@@ -253,12 +253,12 @@
                                 <td>{{ row['Year'] }}</td>
                                 <td>{{ row['Team'] }}</td>
                                 <td>{{ row['G'] }}</td>
-                                <td>{{ row['BA'] }}</td>
+                                <td>{{ "%.3f"|format(row['BA']) }}</td>
                                 <td>{{ row['HR'] }}</td>
                                 <td>{{ row['RBI'] }}</td>
-                                <td>{{ row['OBP'] }}</td>
-                                <td>{{ row['SLG'] }}</td>
-                                <td>{{ row['OPS'] }}</td>
+                                <td>{{ "%.3f"|format(row['OBP']) }}</td>
+                                <td>{{ "%.3f"|format(row['SLG']) }}</td>
+                                <td>{{ "%.3f"|format(row['OPS']) }}</td>
                                 <td>{{ row['H'] }}</td>
                                 <td>{{ row['2B'] }}</td>
                                 <td>{{ row['3B'] }}</td>
@@ -274,10 +274,11 @@
                                 <td>{{ row['SH'] }}</td>
                                 <td>{{ row['CS'] }}</td>
                                 <td>{{ row['SO'] }}</td>
-                                <td>{{ row['rOBA'] }}</td>
+                                <td>{{ row['GIDP'] }}</td>
+                                <td>{{ "%.3f"|format(row['rOBA']) }}</td>
                                 <td>{{ row['Rbat+'] }}</td>
                                 <td>{{ row['OPS+'] }}</td>
-                                <td>{{ row['WAR'] }}</td>
+                                <td>{{ "%.1f"|format(row['WAR']) }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>

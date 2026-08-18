@@ -2,24 +2,46 @@
 THIS VIEW IS FOR PLAYER PROFILE PAGE
 */
 DROP VIEW IF EXISTS career_batting;
-
+-- ADJUSTING THE CALCULATION FOR CORRECT COMPUTATION, FOR AVERAGE STATISTICS WE ARE NOW 
+-- TAKING INTO ACCOUNT THE AMOUNT AT BATS PER SEASON
 CREATE VIEW career_batting AS
 
 SELECT
 
     player_id,
     Player,
-    SUM(G) AS cG,
-    SUM(H) AS cHits,
-    SUM(HR) AS cHomeRuns,
-    SUM('2B') AS cDoubles,
-    SUM('3B') AS cTriples,
-    SUM(RBI) AS cRBIs,
-    SUM(WAR) AS cWAR,
-    AVG(BA) AS cAVG,
-    AVG(OBP) AS cOBP,
-    AVG(SLG) AS cSLG,
-    AVG(OPS) AS cOPS
+    SUM(G) AS G,
+    SUM(H) AS H,
+    SUM(HR) AS HR,
+    SUM([2B]) AS [2B],
+    SUM([3B]) AS [3B],
+    SUM(RBI) AS RBI,
+    SUM(WAR) AS WAR,
+    
+    -- CAREER BATTING AVERAGE
+    CAST(SUM(H) AS REAL) / 
+        NULLIF(SUM(AB), 0) AS BA,
+
+    -- CAREER ON BASE PERCENTAGE
+    CAST(SUM(H) + SUM(BB) + SUM(HBP) AS REAL) / 
+        NULLIF(SUM(AB) + SUM(BB) + SUM(HBP) + SUM(SF), 0) AS OBP,
+
+    -- CAREER SLUGGING PERCENTAGE
+    CAST(SUM(TB) AS REAL) /
+        NULLIF(SUM(AB), 0) AS SLG,
+
+    -- CAREER ON BASE PLUS SLUGGING PERCENTAGE 
+    (
+        CAST(SUM(H) + SUM(BB) + SUM(HBP) AS REAL) / 
+        NULLIF(SUM(AB) + SUM(BB) + SUM(HBP) + SUM(SF), 0)
+    ) 
+    +
+    (
+        CAST(SUM(TB) AS REAL) /
+        NULLIF(SUM(AB), 0)
+    ) AS OPS
+
+
 
 FROM batting_statistics
 GROUP BY 
