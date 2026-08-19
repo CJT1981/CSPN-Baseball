@@ -316,17 +316,45 @@ def get_batting_leaders(stat, year, min_pa = 502):
         raise ValueError("Invalid statistic.")
 
     connection = get_connection()
-    
-    query = f"""
-        SELECT Player, Team, {stat} as stat_value
-        FROM batting_seasons
-        WHERE Year = ? 
-        AND PA >= ?
-        ORDER BY {stat} DESC
-        LIMIT 50;
-    """
-    
-    result_df = pd.read_sql_query(query, connection, params=(year, min_pa))
+
+    # We are getting a problem with the plate appearance rule, problem being the plate
+    # appearance rule is in place to eliminate non-qualified hitters to be returned for stats
+    # that are rates or averages but this rule doesn't need to apply to counting stats 
+    # rate stats (need PA MIN)= batting average, on base percentage, slugging percentage.
+    # counting stats (don't need PA MIN) = # of homeruns, rbis, runs, hits, etc. 
+
+    RATE_STATS = [
+        'BA',
+        'OBP',
+        'SLG',
+        'OPS',
+        'OPS+',
+        'rOBA',
+        'Rbat+'
+    ]
+
+    if stat in RATE_STATS:
+        query = f"""
+            SELECT Player, Team, {stat} as stat_value
+            FROM batting_seasons
+            WHERE Year = ? 
+            AND PA >= ?
+            ORDER BY {stat} DESC
+            LIMIT 50;
+        """
+
+        result_df = pd.read_sql_query(query, connection, params=(year, min_pa))
+    else:
+        query = f"""
+            SELECT Player, Team, {stat} as stat_value
+            FROM batting_seasons
+            WHERE Year = ?
+            ORDER BY {stat} DESC
+            LIMIT 50;
+        """
+
+        result_df = pd.read_sql_query(query, connection, params=(year,))
+
     connection.close()
     
     return result_df
@@ -508,3 +536,23 @@ def get_team_roster(team_id, year_id):
     connection.close()
 
     return batting_team_df, pitching_team_df
+
+def get_team_batting_leaders(year_id):
+    """
+    parameter (int): year_id allows us to also pair our statistics with a particular year
+    return (dataframe): dataframe containing the team batting statistics per one stat
+    """
+
+    connection = get_connection()
+
+    query = """
+        SELECT *
+        FROM team_batting_leaderboard
+        WHERE Year = ?
+    """
+
+    result_df = pd.read_sql_query(query, connection, params=(year_id,))
+
+    connection.close()
+
+    return result_df

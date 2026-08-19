@@ -116,3 +116,12 @@ print("=" * 25)
 
 leaders = get_pitching_leaders("SO", 2023)
 print(leaders)
+
+print("\n")
+
+print("=" * 25)
+print("TESTING BATTING TEAM LEADERS")
+print("=" * 25)
+
+team_leaders = get_team_batting_leaders(2023)
+print(team_leaders)

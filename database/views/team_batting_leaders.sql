@@ -1,0 +1,38 @@
+/*
+THIS VIEW WILL ALLOW US TO CREATE A TEAM LEADERBOARD PAGE BY GROUP THE DATA BY TEAM AND YEAR
+*/
+DROP VIEW IF EXISTS team_batting_leaderboard;
+
+CREATE VIEW team_batting_leaderboard AS 
+
+SELECT
+    -- IMPORTANT PARAMETERS TO GROUP BY
+    Team, 
+    Year,
+    -- GATHERING COUNTING STATS
+    SUM(AB) AS AB,
+    SUM(R) AS R,
+    SUM(H) AS H,
+    SUM([2B]) AS [2B],
+    SUM([3B]) AS [3B],
+    SUM(HR) AS HR,
+    SUM(RBI) AS RBI,
+    SUM(BB) AS BB,
+    SUM(TB) AS TB, 
+    SUM(WAR) AS WAR,
+    -- COMPUTING AVERAGE STATS:
+    -- BATTING AVERAGE
+    CAST(SUM(H) AS REAL) / NULLIF(SUM(AB),0) AS BA,
+
+    -- ON BASE PLUS SLUGGING PERCENTAGE
+    CAST(SUM(H) + SUM(BB) + SUM(HBP) AS REAL) /
+        NULLIF(SUM(AB) + SUM(BB) + SUM(HBP) + SUM(SF), 0) AS OBP, 
+    
+    -- SLUGGING PERCENTAGE
+    CAST(SUM(TB) AS REAL) / NULLIF(SUM(AB),0) AS SLG
+
+FROM batting_statistics
+GROUP BY 
+    Team,
+    Year;
+    

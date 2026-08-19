@@ -53,5 +53,9 @@ def player_profile(player_id):
 
     )
 
+@app.route('/leaderboard/batting<int:year>')
+def batting_leaderboard(year):
+    return
+
 if __name__ == '__main__':
     app.run(debug=True)
