@@ -55,6 +55,40 @@ def player_profile(player_id):
 
 @app.route('/leaderboard/batting<int:year>')
 def batting_leaderboard(year):
+    # 1st Iteraion
+    
+    # We have a function to get the leaderboard for the stat we want, we
+    # just need to get these individual stat leaders. We will get this 
+    # done here:
+    STATS = {
+        'WAR' : 'Wins Above Replacement',
+        'G' : 'Games Played',
+        'PA' : 'Plate Appearances',
+        'AB' : 'At Bats',
+        'R' : 'Runs Scored',
+        'H' : 'Hits',
+        '2B' : 'Doubles',
+        '3B' : 'Triples',
+        'HR' : 'Home Runs',
+        'RBI' : 'Runs Batted In',
+        'SB' : 'Stolen Bases',
+        'CS' : 'Caught Stealing',
+        'BB' : 'Walks',
+        'SO' : 'Strikeouts',
+        'BA' : 'Batting Average',
+        'OBP' : 'On Base Percentage',
+        'SLG' : 'Slugging Percentage',
+        'OPS' : 'On Base + Slugging Percentage',
+        'OPS+' : 'OPS+',
+        'rOBA' : 'rOBA',
+        'Rbat+' : 'Rbat+',
+        'TB' : 'Total Bases',
+        'GIDP' : 'Grounded Into Double Plays',
+        'HBP' : 'Hit By Pitches',
+        'SH' : 'Sacrifice Hits',
+        'SF' : 'Sacrifice Flys',
+        'IBB' : 'Intential Walks'
+    }
     return
 
 if __name__ == '__main__':
