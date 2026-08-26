@@ -53,13 +53,16 @@ def player_profile(player_id):
 
     )
 
-@app.route('/leaderboard/batting<int:year>')
+@app.route('/leaderboard/batting/<int:year>')
 def batting_leaderboard(year):
-    # 1st Iteraion
+    # 1st Iteration
     
     # We have a function to get the leaderboard for the stat we want, we
     # just need to get these individual stat leaders. We will get this 
     # done here:
+    
+    # We are working with this dictionary, so we can have a more 
+    # descriptive understanding of our data rather than an array or list
     STATS = {
         'WAR' : 'Wins Above Replacement',
         'G' : 'Games Played',
@@ -89,7 +92,22 @@ def batting_leaderboard(year):
         'SF' : 'Sacrifice Flys',
         'IBB' : 'Intential Walks'
     }
-    return
+    
+    leaderboards = {}
+    
+    for stat, name in STATS.items():
+        leaderboards[stat] = {
+            'name': name,
+            'data': get_batting_leaders(stat,year)
+        }
+    
+    print(leaderboards['BA']['data'])
+        
+    return render_template(
+        'batting_leaderboard.html',
+        year = year,
+        leaderboards = leaderboards
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

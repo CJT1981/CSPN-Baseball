@@ -335,21 +335,21 @@ def get_batting_leaders(stat, year, min_pa = 502):
 
     if stat in RATE_STATS:
         query = f"""
-            SELECT Player, Team, {stat} as stat_value
+            SELECT Player, Team, "{stat}" as stat_value
             FROM batting_seasons
             WHERE Year = ? 
             AND PA >= ?
-            ORDER BY {stat} DESC
+            ORDER BY "{stat}" DESC
             LIMIT 50;
         """
 
         result_df = pd.read_sql_query(query, connection, params=(year, min_pa))
     else:
         query = f"""
-            SELECT Player, Team, {stat} as stat_value
+            SELECT Player, Team, "{stat}" as stat_value
             FROM batting_seasons
             WHERE Year = ?
-            ORDER BY {stat} DESC
+            ORDER BY "{stat}" DESC
             LIMIT 50;
         """
 
