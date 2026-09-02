@@ -55,7 +55,7 @@ def player_profile(player_id):
 
 @app.route('/leaderboard/batting/<int:year>')
 def batting_leaderboard(year):
-    # 1st Iteration
+    # 4th Iteration
     
     # We have a function to get the leaderboard for the stat we want, we
     # just need to get these individual stat leaders. We will get this 
@@ -100,12 +100,62 @@ def batting_leaderboard(year):
             'name': name,
             'data': get_batting_leaders(stat,year)
         }
-    
+    """
     print(leaderboards['BA']['data'])
-        
+    """ 
     return render_template(
         'batting_leaderboard.html',
         year = year,
+        leaderboards = leaderboards
+    )
+
+@app.route('/leaderboard/pitching/<int:year>')
+def pitching_leaderboard(year):
+    # 1st iteration
+    
+    # Similar to the batting leaderboard we are going to pull data via dataframes
+    # and we are going to save it through a dictionary
+    
+    # The stats we are going to show leaderboards for 
+    STAT = {
+        'WAR' : 'Wins Above Replacement',
+        'W' : 'Wins',
+        'L' : 'Losses',
+        'ERA' : 'Earned Run Average',
+        'G' : 'Games Pitched',
+        'GS' : 'Gamed Started',
+        'CG' : 'Complete Games',
+        'SHO' : 'Shutouts',
+        'SV' : 'Saves',
+        'IP' : 'Innings Pitched',
+        'H' : 'Hits Allowed',
+        'R' : 'Runs Allowed',
+        'ER' : 'Earned Runs Allowed',
+        'HR' : 'Homeruns Allowed',
+        'BB' : 'Walks allowed',
+        'SO' : 'Strikeouts',
+        'HBP' : 'Hit By Pitches',
+        'ERA+' : 'Earned Run Average Plus',
+        'FIP' : 'Fielding Independent Pitching',
+        'WHIP' : 'Walks plus Hits per Inning Pitched',
+        'H9' : 'Hits per 9',
+        'HR9' : 'Homeruns per 9',
+        'BB9' : 'Walks per 9',
+        'SO9' : 'Strikeouts per 9',
+        'SO/BB' : 'Strikeouts per Walk'
+    }
+    
+    leaderboards = {}
+    
+    for stat, name in STAT.items():
+        leaderboards[stat] = {
+            'name' : name,
+            'data' : get_pitching_leaders(stat,year)
+        }
+    
+    return render_template(
+        'pitching_leaderboard.html',
+        year=year,
         leaderboards = leaderboards
     )
 

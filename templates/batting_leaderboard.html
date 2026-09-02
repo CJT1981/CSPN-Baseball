@@ -1,7 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{{ year }} Batting Leaders</title>
+  </head>
+
+  <body>
+
+    <h1>{{ year }} Batting Leaders</h1>
+
+    {% for stat, leaderboard in leaderboards.items() %}
+      <h2>{{ leaderboard.name }}</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Team</th>
+            <th>{{ stat }}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for index, player in leaderboard.data.iterrows() %}
+            <tr>
+              <td>{{ index + 1 }}</td>
+              <td>{{ player['Player'] }}</td>
+              <td>{{ player['Team'] }}</td>
+              <td>
+                {% if stat in [ 'BA', 'OBP','SLG', 'OPS'] %}
+                  {{ "%.3f"|format(player['stat_value'])|replace('0.', '.') }}
+                {% else %}
+                  {{ player['stat_value'] }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+    {% endfor %}
+  </body>
+</html>
+
