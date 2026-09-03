@@ -6,11 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>{{ year }} Batting Leaders</title>
+
+    <style>
+      /* 
+        I want to hide the leaderboard rows beyond the first 10 and this allows to 
+        do exactly that.
+      */
+      .extra-row {
+        display: none;
+      }
+    </style>
   </head>
 
+  <!--
+    AS OF RIGHT NOW, WE ARE JUST TRYING TO DISPLAY DATA. WE WILL ADD STYLING LATER.
+    -->
   <body>
 
     <h1>{{ year }} Batting Leaders</h1>
+
+    <!--
+      I am going to add a toggle so the user may switch between the batting and pitching 
+      leaderboards, in order to have this functionality I need to have these links 
+      established.
+    -->
+    <div class="leadeboard-toggle">
+      <a href="{{ url_for('batting_leaderboard', year=year) }}">
+        Batting Leaders
+      </a>
+      <a href="{{ url_for('pitching_leaderboard', year=year) }}">
+        Pitching Leaders
+      </a>
+    </div>
 
     {% for stat, leaderboard in leaderboards.items() %}
       <h2>{{ leaderboard.name }}</h2>
@@ -24,11 +51,17 @@
             <th>{{ stat }}</th>
           </tr>
         </thead>
-
+        <!--
+          I am attempting to add some functionality to the table where it will only show
+          the top 10 players for each table to consolidate the page and make it easier to 
+          read and scroll through. My plan is to add a button titled "Show More" and upon
+          clicking it, it will show the rest of the player up to the top 50. I will also
+          add a "Show Less" button to collapse the table back to the top 10. 
+        -->
         <tbody>
           {% for index, player in leaderboard.data.iterrows() %}
-            <tr>
-              <td>{{ index + 1 }}</td>
+            <tr class="{% if loop.index > 10 %}extra-row{% endif %}">
+              <td>{{ player['rank'] }}</td>
               <td>{{ player['Player'] }}</td>
               <td>{{ player['Team'] }}</td>
               <td>
@@ -43,7 +76,38 @@
 
         </tbody>
       </table>
+
+      <button class="show-more-button" onclick="toggleRows(this)">
+        Show More
+      </button>
+
     {% endfor %}
+    
+    <!--
+      This is where I will add the javascript to make the "Show More" and "Show Less"
+      buttons work.
+    -->
+    <script>
+      function toggleRows(button) {
+
+        // We need to first get the table that this button is associated with.
+        const table = button.previousElementSibling;
+
+        // We need to gather all the "extra-row" classed rows in the table.
+        const extraRows = table.querySelectorAll('.extra-row');
+
+        // We need to check if the rows are currently hidden or shown. So our buttons
+        // may behave accordingly.
+        const isHidden = extraRows[0].style.display === '';
+
+        // Here we will show or hid the extra rows based on the current state.
+        extraRows.forEach(row => {
+          row.style.display = isHidden ? 'table-row' : 'none';
+        });
+
+        // Change the button text based on the current state.
+        button.textContent = isHidden ? 'Show Less' : 'Show More';
+      }
+    </script>
   </body>
 </html>
-

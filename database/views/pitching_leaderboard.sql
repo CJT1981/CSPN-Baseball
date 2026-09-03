@@ -14,6 +14,7 @@ SELECT
     WAR,
     W,
     L,
+    "W-L%",
     ERA,
     G,
     GS,

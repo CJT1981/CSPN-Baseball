@@ -55,7 +55,7 @@ def player_profile(player_id):
 
 @app.route('/leaderboard/batting/<int:year>')
 def batting_leaderboard(year):
-    # 4th Iteration
+    # 6th Iteration
     
     # We have a function to get the leaderboard for the stat we want, we
     # just need to get these individual stat leaders. We will get this 
@@ -111,10 +111,11 @@ def batting_leaderboard(year):
 
 @app.route('/leaderboard/pitching/<int:year>')
 def pitching_leaderboard(year):
-    # 1st iteration
+    # 5th iteration
     
-    # Similar to the batting leaderboard we are going to pull data via dataframes
-    # and we are going to save it through a dictionary
+    # Similar to the batting leaderboard we are going to pull data via 
+    # dataframes and we are going to save it through a dictionary and 
+    # we are going to pass it to the template to be rendered.
     
     # The stats we are going to show leaderboards for 
     STAT = {
@@ -123,7 +124,7 @@ def pitching_leaderboard(year):
         'L' : 'Losses',
         'ERA' : 'Earned Run Average',
         'G' : 'Games Pitched',
-        'GS' : 'Gamed Started',
+        'GS' : 'Games Started',
         'CG' : 'Complete Games',
         'SHO' : 'Shutouts',
         'SV' : 'Saves',
@@ -148,6 +149,8 @@ def pitching_leaderboard(year):
     leaderboards = {}
     
     for stat, name in STAT.items():
+        # print(get_pitching_leaders(stat,year).dtypes)
+
         leaderboards[stat] = {
             'name' : name,
             'data' : get_pitching_leaders(stat,year)

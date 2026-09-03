@@ -4,67 +4,6 @@ import pandas as pd
 
 # This stores my reusable SQL functions 
 
-def top_batting_average(year, min_pa = 502):
-    """
-    Returns the top batting averages for a given year among players with the 
-    qualified number of at-bats.
-
-    MLB rules state that a player must have 3.1 plate appearances per league game to qualify
-    for any leaderboard. In a 162-game season, this equates to 502 plate appearances.
-    
-    Parameters:
-    year (int): The year to filter the data.
-    min_pa (int): 502 - The minimum number of plate appearances to consider.
-    
-    Returns:
-    DataFrame: A pandas DataFrame containing the top batting averages.
-    """
-    connection = get_connection()
-    
-    query = f"""
-        SELECT Player, Team, BA as batting_average
-        FROM batting_statistics
-        WHERE Year = {year} 
-        AND PA >= {min_pa}
-        ORDER BY batting_average DESC
-        LIMIT 10;
-    """
-    
-    result_df = pd.read_sql_query(query, connection)
-    
-    connection.close()
-    
-    return result_df
-
-def top_home_runs(year, min_pa = 502):
-    """
-    Returns the top home run hitters for a given year among players with the 
-    qualified number of plate appearances.
-
-    Parameters:
-    year (int): The year to filter the data.
-    min_pa (int): 502 - The minimum number of plate appearances to consider.
-    
-    Returns:
-    DataFrame: A pandas DataFrame containing the top home run hitters.
-    """
-    connection = get_connection()
-    
-    query = f"""
-        SELECT Player, Team, HR as home_runs
-        FROM batting_statistics
-        WHERE Year = {year} 
-        AND PA >= {min_pa}
-        ORDER BY home_runs DESC
-        LIMIT 10;
-    """
-    
-    result_df = pd.read_sql_query(query, connection)
-    
-    connection.close()
-    
-    return result_df
-
 def team_HR_leaders(year, min_pa = 502):
     """
     Returns the top home run hitters for each team in a given year, we do not need a 
@@ -311,7 +250,8 @@ def get_batting_leaders(stat, year, min_pa = 502):
         'IBB'
     ]
 
-    # This accounts for user input errors, if the user inputs a stat that is not in the allowed stats list, we will raise an error.
+    # This accounts for user input errors, if the user inputs a stat that is not
+    # in the allowed stats list, we will raise an error.
     if stat not in ALLOWED_STATS:
         raise ValueError("Invalid statistic.")
 
@@ -322,7 +262,6 @@ def get_batting_leaders(stat, year, min_pa = 502):
     # that are rates or averages but this rule doesn't need to apply to counting stats 
     # rate stats (need PA MIN)= batting average, on base percentage, slugging percentage.
     # counting stats (don't need PA MIN) = # of homeruns, rbis, runs, hits, etc. 
-
     RATE_STATS = [
         'BA',
         'OBP',
@@ -355,20 +294,37 @@ def get_batting_leaders(stat, year, min_pa = 502):
 
         result_df = pd.read_sql_query(query, connection, params=(year,))
 
+    # We are having a problem with the ranking of the data, we are not
+    # not accounting for ties in the data. Therefore, we are adding this
+    # next line to adjust the ranking of the data to show ties correctly.
+    # We are using the "min" method to assign the same rank to tied values,
+    # and the next rank will be the next integer after the tied values.
+    result_df['rank'] = result_df['stat_value'].rank(
+        method='min',
+        ascending=False
+    )
+
+    # We convert the rank column to an int to avoid decimal points in the
+    # rank values, such as 1.0, 2.0, etc.
+    result_df['rank'] = result_df['rank'].astype(int)
+
     connection.close()
     
     return result_df
 
 def get_pitching_leaders(stat, year, min_ip = 162):
     """
-    Returns the top players for a specified pitching statistic in a given year among players with the 
-    qualified number of innings pitched.
+    Returns the top players for a specified pitching statistic in a given year.
+
+    Rate statistics such as ERA, WHIP, and FIP require a minimum number of
+    innings pitched to qualify. Counting statistics such as wins, strikeouts,
+    and saves do not require the minimum innings qualification.
 
     Parameters:
     stat (str): The pitching statistic to filter by (e.g., 'ERA', 'SO', 'WHIP').
     year (int): The year to filter the data.
-    min_ip (int): 162 - The minimum number of innings pitched to consider.
-    
+    min_ip (int): The minimum number of innings pitched required for rate statistics.
+
     Returns:
     DataFrame: A pandas DataFrame containing the top players for the specified statistic.
     """
@@ -407,13 +363,22 @@ def get_pitching_leaders(stat, year, min_ip = 162):
         'SO/BB'
     ]
 
+    RATE_STATS = [
+        'ERA',
+        'ERA+',
+        'FIP',
+        'WHIP',
+        'H9',
+        'HR9',
+        'BB9',
+        'SO9',
+        'W-L%',
+        'SO/BB'
+    ]
+
     ascending_stats = [
         'ERA', 
-        'H',
-        'R',
-        'ER',
-        'HR',
-        'BB',
+        'FIP',
         'WHIP', 
         'H9',
         'HR9',
@@ -424,22 +389,62 @@ def get_pitching_leaders(stat, year, min_ip = 162):
     if stat not in ALLOWED_STATS:
         raise ValueError("Invalid statistic.")
 
+    # This helps with the ordering of the stats, some stats are better when they are lower
+    # such as ERA, WHIP, and others. And, there are others that are better when they are 
+    # higher such as Wins, Strikeouts, and others. So, we need this check
     direction = 'DESC'
     if stat in ascending_stats:
         direction = 'ASC'
 
     connection = get_connection()
-    
-    query = f"""
-        SELECT Player, Team, [{stat}] as stat_value
-        FROM pitching_seasons
-        WHERE Year = ? 
-        AND IP >= ?
-        ORDER BY [{stat}] {direction}
-        LIMIT 50;
-    """
-    
-    result_df = pd.read_sql_query(query, connection, params=(year, min_ip))
+
+    # This allows us to apply the innings pitched qualification rule to rate stats such 
+    # as ERA, WHIP, and others. But, we don't need to apply this qualifier to counting 
+    # stats such as Strikouts, Wins, and others. 
+    if stat in RATE_STATS:
+        query = f"""
+            SELECT Player, Team, [{stat}] as stat_value
+            FROM pitching_seasons
+            WHERE Year = ? 
+            AND IP >= ?
+            ORDER BY [{stat}] {direction}
+            LIMIT 50;
+        """
+        
+        result_df = pd.read_sql_query(query, connection, params=(year, min_ip))
+    else:
+        query = f"""
+            SELECT Player, Team, [{stat}] as stat_value
+            FROM pitching_seasons
+            WHERE Year = ?
+            ORDER BY [{stat}] {direction}
+            LIMIT 50;
+        """
+        
+        result_df = pd.read_sql_query(query, connection, params=(year,))
+
+    # We are having a problem with some of the data coming back as strings
+    # instead of floats or integers. This is causing problems with the 
+    # sorting of the data. Therefore, we are adding this next line to 
+    # convert the data to the correct type.
+    result_df['stat_value'] = pd.to_numeric(
+        result_df['stat_value'],
+        errors='coerce'
+    )
+
+    # We are having a problem with the ranking of the data, we are not
+    # not accounting for ties in the data. Therefore, we are adding this
+    # next line to adjust the ranking of the data to show ties correctly.
+    # We are using the "min" method to assign the same rank to tied values,
+    # and the next rank will be the next integer after the tied values.
+    result_df['rank'] = result_df['stat_value'].rank(
+        method='min',
+        ascending=(direction == 'ASC')
+    )
+
+    # We convert the rank column to an int to avoid decimal points in the
+    # rank values, such as 1.0, 2.0, etc.
+    result_df['rank'] = result_df['rank'].astype(int)
     
     connection.close()
     
