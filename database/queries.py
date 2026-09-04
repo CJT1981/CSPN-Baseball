@@ -403,22 +403,18 @@ def get_pitching_leaders(stat, year, min_ip = 162):
     # stats such as Strikouts, Wins, and others. 
     if stat in RATE_STATS:
         query = f"""
-            SELECT Player, Team, [{stat}] as stat_value
+            SELECT Player, Team, "{stat}" as stat_value
             FROM pitching_seasons
             WHERE Year = ? 
             AND IP >= ?
-            ORDER BY [{stat}] {direction}
-            LIMIT 50;
         """
         
         result_df = pd.read_sql_query(query, connection, params=(year, min_ip))
     else:
         query = f"""
-            SELECT Player, Team, [{stat}] as stat_value
+            SELECT Player, Team, "{stat}" as stat_value
             FROM pitching_seasons
             WHERE Year = ?
-            ORDER BY [{stat}] {direction}
-            LIMIT 50;
         """
         
         result_df = pd.read_sql_query(query, connection, params=(year,))
@@ -430,6 +426,13 @@ def get_pitching_leaders(stat, year, min_ip = 162):
     result_df['stat_value'] = pd.to_numeric(
         result_df['stat_value'],
         errors='coerce'
+    )
+
+    # Previous version of the code was not sorting the data correctly, so instead of having 
+    # it be done through SQL, we are going to have pandas do the sorting of the data. 
+    result_df = result_df.sort_values(
+        'stat_value',
+        ascending=(direction == 'ASC')
     )
 
     # We are having a problem with the ranking of the data, we are not
@@ -445,6 +448,10 @@ def get_pitching_leaders(stat, year, min_ip = 162):
     # We convert the rank column to an int to avoid decimal points in the
     # rank values, such as 1.0, 2.0, etc.
     result_df['rank'] = result_df['rank'].astype(int)
+
+    # Here is where we take the top 50 players for the specified stat after it is
+    # sorted and ranked correctly for us.
+    result_df = result_df.head(50) 
     
     connection.close()
     
@@ -473,11 +480,10 @@ def get_player_search(user_input):
 
     return result_df
 
-def get_team(team_id, year_id):
+def get_team(team_id):
     """
     parameter (str): team_id - The ID of the team to search for.
-    parameter (int): year_id - The year to filter the data.
-    returns: A pandas DataFrame containing the team information for the specified year.
+    returns: A pandas DataFrame containing the team information.
     """
 
     connection = get_connection()
@@ -496,10 +502,11 @@ def get_team(team_id, year_id):
             finish,
             playoff_result
         FROM franchise_history
-        WHERE team_id = ? AND year_id = ?;
+        WHERE team_id = ?
+        ORDER BY year_id DESC;
         """
 
-    result_df = pd.read_sql_query(query, connection, params=(team_id, year_id))
+    result_df = pd.read_sql_query(query, connection, params=(team_id,))
 
     connection.close()
 

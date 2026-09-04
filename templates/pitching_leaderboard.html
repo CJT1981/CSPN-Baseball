@@ -6,15 +6,11 @@
         
         <title>{{ year }} Pitching Leaders</title>
 
-        <style>
-            /* 
-                I want to hide the leaderboard rows beyond the first 10 and this allows to 
-                do exactly that.
-            */
-            .extra-row {
-                display: none;
-            }
-        </style>
+            <!--
+            For the css, we will add it all onto a separate file, and here is where we will
+            link to it.
+            -->
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
     </head>
     <!--
     AS OF RIGHT NOW, WE ARE JUST TRYING TO DISPLAY DATA. WE WILL ADD STYLING LATER.
@@ -27,52 +23,71 @@
         leaderboards, in order to have this functionality I need to have these links 
         established.
         -->
-        <div class="leadeboard-toggle">
-        <a href="{{ url_for('batting_leaderboard', year=year) }}">
-            Batting Leaders
-        </a>
-        <a href="{{ url_for('pitching_leaderboard', year=year) }}">
-            Pitching Leaders
-        </a>
+        <div class="leaderboard-toggle">
+            <a href="{{ url_for('batting_leaderboard', year=year) }}">
+                Batting Leaders
+            </a>
+            <a href="{{ url_for('pitching_leaderboard', year=year) }}">
+                Pitching Leaders
+            </a>
+        </div>
+        <!--
+        I am going to add a year selection option for the user to navigate through the 
+        different seasons of baseball, and see the leaders for each year/season.
+        -->
+        <div class="year-selector">
+        <label for="year">Select Year:</label>
+        <select id="year" onchange="changeYear(this.value)">
+            {% for selected_year in range(2000, 2027) %}
+            <option value="{{ selected_year }}"
+                {% if selected_year == year %}selected{% endif %}>
+                {{ selected_year }}
+            </option>
+            {% endfor %}
+        </select>
         </div>
 
-        {% for stat, leaderboard in leaderboards.items() %}
-            <h2>{{ leaderboard.name }}</h2>
+        <div class="leaderboard-grid">
+            {% for stat, leaderboard in leaderboards.items() %}
+                <div class="leaderboard-card">
+                    <h2>{{ leaderboard.name }}</h2>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Player</th>
-                        <th>Team</th>
-                        <th>{{ stat }}</th>
-                    </tr>
-                </thead>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player</th>
+                                <th>Team</th>
+                                <th>{{ stat }}</th>
+                            </tr>
+                        </thead>
 
-                <tbody>
-                    {% for index, player in leaderboard.data.iterrows() %}
-                        <tr class="{% if loop.index > 10 %}extra-row{% endif %}">
-                            <td>{{ player['rank'] }}</td>
-                            <td>{{ player['Player'] }}</td>
-                            <td>{{ player['Team'] }}</td>
-                            <td>
-                                {% if stat in [ 'ERA', 'WHIP', 'FIP', 'SO/BB'] %}
-                                    {{ "%.2f"|format(player['stat_value']) }}
-                                {% elif stat in ['H9', 'HR9', 'BB9', 'SO9'] %}
-                                    {{ "%.1f"|format(player['stat_value']) }}
-                                {% else %}
-                                    {{ player['stat_value'] }}
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        <tbody>
+                            {% for index, player in leaderboard.data.iterrows() %}
+                                <tr class="{% if loop.index > 10 %}extra-row{% endif %}">
+                                    <td>{{ player['rank'] }}</td>
+                                    <td>{{ player['Player'] }}</td>
+                                    <td>{{ player['Team'] }}</td>
+                                    <td>
+                                        {% if stat in [ 'ERA', 'WHIP', 'FIP', 'SO/BB'] %}
+                                            {{ "%.2f"|format(player['stat_value']) }}
+                                        {% elif stat in ['H9', 'HR9', 'BB9', 'SO9'] %}
+                                            {{ "%.1f"|format(player['stat_value']) }}
+                                        {% else %}
+                                            {{ player['stat_value'] }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
 
-            <button class="show-more-button" onclick="toggleRows(this)">
-                Show More
-            </button>
-        {% endfor %}
+                    <button class="show-more-button" onclick="toggleRows(this)">
+                        Show More
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
 
         <!--
         This is where I will add the javascript to make the "Show More" and "Show Less"
@@ -87,9 +102,10 @@
             // We need to gather all the "extra-row" classed rows in the table.
             const extraRows = table.querySelectorAll('.extra-row');
 
-            // We need to check if the rows are currently hidden or shown. So our buttons
-            // may behave accordingly.
-            const isHidden = extraRows[0].style.display === '';
+            // Previous version failed to check if the rows were actually hidden or not,
+            // so we are going to use this function : getComputedStyle() to check the
+            // CSS applied to the element. 
+            const isHidden = window.getComputedStyle(extraRows[0]).display === 'none';
 
             // Here we will show or hid the extra rows based on the current state.
             extraRows.forEach(row => {
@@ -98,6 +114,25 @@
 
             // Change the button text based on the current state.
             button.textContent = isHidden ? 'Show Less' : 'Show More';
+        }
+
+        function changeYear(year) {
+            /* 
+            This allows us to get the current page URL. Furthermore determine whether 
+            the user is viewing batting or pitching leaders.
+            */
+            const currentPath = window.location.pathname;
+
+            /*
+            Checking if we are currently on the batting or pitching leaderboard page, and 
+            we change the URL accordingly to navigate to the selected year.
+            */
+            if (currentPath.includes('leaderboard/batting')) {
+            window.location.href = `/leaderboard/batting/${year}`;
+            } 
+            else if (currentPath.includes('leaderboard/pitching')) {
+            window.location.href = `/leaderboard/pitching/${year}`;
+            }
         }
         </script>
     </body>

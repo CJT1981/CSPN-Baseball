@@ -92,7 +92,7 @@ print("=" * 25)
 print("TESTING PITCHING LEADERS")
 print("=" * 25)
 
-leaders = get_pitching_leaders("W-L%", 2023)
+leaders = get_pitching_leaders("ERA+", 2012)
 print(leaders)
 
 print("\n")

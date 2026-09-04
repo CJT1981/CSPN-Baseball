@@ -1,0 +1,49 @@
+/*
+    THIS CSS FILE IS FOR THE LEADERBOARD PAGES. IT WILL BE USED TO STYLE THE 
+    LEADERBOARD TABLES AMD ORGANIZE THE CONTENT A BIT BETTER.
+*/
+
+/* Leaderboard Grid:
+    This will allow the page to display three leaderboard tables per row on larger screens.
+*/
+.leaderboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin: 30px;
+}
+
+/* Individual Leaderboard Tables 
+    This maximizes the space for each individual leaderboard tables.
+*/
+.leaderboard-card {
+    width: 100%;
+}
+
+/* We are making sure the actual data being displayed fills the allocated space */
+.leaderboard-card table {
+    width: 100%;
+}
+
+/* This hides the extra rows by default */
+.extra-row {
+    display: none;
+}
+
+/* 
+    We must accommodate for the different screen sizes, 
+    so we must adjust the layout accordingly.
+    Here, we are adjusting the layout for screens that are 1000px or smaller.
+*/
+@media (max-width: 1000px) {
+    .leaderboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .leaderboard-grid {
+        grid-template-columns: 1fr;
+        margin: 15px;
+    }
+}
