@@ -480,6 +480,42 @@ def get_player_search(user_input):
 
     return result_df
 
+def get_teams():
+    """
+    2nd Iteration:
+    Problem - returning multiple teams from the same franchise such as 
+    Cleveland Guardians and Cleveland Indians
+
+    Solution - we have to use an inner query to find the latest year
+    for our outer query to find all the current teams
+
+    Returns a list of current MLB teams.
+    
+    Returns: DataFrame - A pandas DataFrame containing the teams.
+    """
+    connection = get_connection()
+
+    query = """
+        SELECT DISTINCT 
+            franchise_id, 
+            team_name,
+            league,
+            division
+        FROM franchise_history
+        WHERE year_id = (
+            SELECT MAX(fh2.year_id)
+            FROM franchise_history AS fh2
+            WHERE fh2.franchise_id = franchise_history.franchise_id
+        )
+        ORDER BY league, division, team_name;
+    """
+
+    result_df = pd.read_sql_query(query, connection)
+
+    connection.close()
+
+    return result_df
+
 def get_team(team_id):
     """
     parameter (str): team_id - The ID of the team to search for.
@@ -490,6 +526,8 @@ def get_team(team_id):
 
     query = """
         SELECT 
+            franchise_id,
+            team_id,
             year_id,
             team_name,
             league,
@@ -500,7 +538,7 @@ def get_team(team_id):
             ties,
             winning_percentage,
             finish,
-            playoff_result
+            COALESCE(playoff_result, '-') AS playoff_result
         FROM franchise_history
         WHERE team_id = ?
         ORDER BY year_id DESC;

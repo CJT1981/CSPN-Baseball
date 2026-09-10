@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ team_id }} {{ year }} Roster</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/team.css') }}">
+</head>
+
+<body>
+    <h1>{{ team_id }} - {{ year }} Roster</h1>
+
+    <!-- BATTERS -->
+    <h2>Batters</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Players</th>
+                <th>Position</th>
+                <th>Games</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for index, player in batters.iterrows() %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for(
+                            'player_profile',
+                            player_id=player['player_id']
+                            )}}">
+                            {{ player['Player'] }}
+                        </a>
+                    </td>
+
+                    <td>{{ player['Pos'] }}</td>
+                    <td>{{ player['G'] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- PITCHERS -->
+    <h2>Pitchers</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>Position</th>
+                <th>Games</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for index, player in pitchers.iterrows() %}
+                <tr> 
+                    <td>
+                        <a href="{{ url_for(
+                            'player_profile',
+                            player_id=player['player_id']
+                        )}}">
+                            {{ player['Player'] }}
+                        </a>
+                    </td>
+                    <td>{{ player['Pos'] }}</td>
+                    <td>{{ player['G'] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MLB Teams</title>
+
+    <!-- We will create a separate CSS file for styling -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/team.css') }}">
+</head>
+
+<body>
+    <h1>MLB Teams</h1>
+
+    <p>Select a team to view its history and seasion information.</p>
+
+    <!-- AMERICAN LEAGUE -->
+
+    <h2>American League</h2>
+    <div class="team-grid">
+        {% for division in ['East', 'Central', 'West'] %}
+            <div class="division">
+                <h3>{{ division }}</h3>
+                {% for index, team in teams.iterrows() %}
+                    {% if team['league'] == 'AL' and team['division'] == division %}
+                        <a href="{{ url_for('team_page', team_id=team['franchise_id']) }}">
+                            {{ team['team_name'] }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- NATIONAL LEAGUE -->
+    <h2>National League</h2>
+    <div class="team-grid">
+        {% for division in ['East', 'Central', 'West'] %}
+            <div class="division">
+                <h3>{{ division }}</h3>
+                {% for index, team in teams.iterrows() %}
+                    {% if team['league'] == 'NL' and team['division'] == division %}
+                        <a href="{{ url_for('team_page', team_id=team['franchise_id'])}}">
+                            {{ team['team_name'] }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

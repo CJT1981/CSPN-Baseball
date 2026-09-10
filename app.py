@@ -162,5 +162,36 @@ def pitching_leaderboard(year):
         leaderboards = leaderboards
     )
 
+@app.route('/teams')
+def teams():
+    teams = get_teams()
+
+    return render_template(
+        'teams.html',
+        teams=teams
+    )
+
+@app.route('/team/<team_id>')
+def team_page(team_id):
+
+    team_data = get_team(team_id)
+
+    return render_template(
+        'team.html',
+        team=team_data,
+        team_id=team_id
+    )
+
+@app.route('/team/<team_id>/<int:year_id>/roster')
+def teams_roster(team_id, year_id):
+    batters, pitchers = get_team_roster(team_id, year_id)
+
+    return render_template(
+        'team_roster.html',
+        team_id=team_id,
+        year_id=year_id,
+        batters = batters,
+        pitchers = pitchers
+    )
 if __name__ == '__main__':
     app.run(debug=True)

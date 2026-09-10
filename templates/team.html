@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width", initial-scale="1.0">
+
+    <title>{{ team.iloc[0]['team_name'] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/team.css') }}">
+</head>
+
+<body>
+    <!-- TEAM HEADER -->
+    <h1>{{ team.iloc[0]['team_name'] }}</h1>
+
+    <p>
+        {{ team.iloc[0]['league'] }} League - 
+        {{ team.iloc[0]['division'] }} Division 
+    </p>
+
+    <!-- SEASON HISTORY -->
+    <h2>Season History</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Team Name</th>
+                <th>Games</th>
+                <th>Wins</th>
+                <th>Losses</th>
+                <th>Ties</th>
+                <th>Win %</th>
+                <th>Finish</th>
+                <th>Playoffs</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for index, season in team.iterrows() %}
+                <tr>
+                    <td>
+                        <a href="{{url_for(
+                            'teams_roster', 
+                            team_id=team_id, 
+                            year_id=season['year_id'] 
+                            )}}">
+                            {{ season['year_id'] }}
+                        </a>
+                    </td>
+                    <td>{{ season['team_name'] }}</td>
+                    <td>{{ season['number_of_games'] }}</td>
+                    <td>{{ season['wins'] }}</td>
+                    <td>{{ season['losses'] }}</td>
+                    <td>{{ season['ties'] }}</td>
+                    <td>{{ "%.3f"|format(season['winning_percentage']) }}</td>
+                    <td>{{ season['finish'] }}</td>
+                    <td>{{ season['playoff_result'] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>
