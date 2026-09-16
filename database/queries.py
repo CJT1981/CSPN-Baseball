@@ -613,7 +613,8 @@ def get_team_stat_leaders(team_id, year_id):
             SB,
             BB,
             WAR,
-            BA
+            BA,
+            PA
         FROM batting_seasons
         WHERE Year = ? AND Team = ?
         ORDER BY PA DESC;
@@ -650,37 +651,22 @@ def get_team_stat_leaders(team_id, year_id):
         qualified_batting = batting_df[batting_df['PA'] >= 100]
 
         if not qualified_batting.empty:
-            batting_leaders['BA'] = qualified_batting.loc[
-                qualified_batting['BA'].idxmax()
-            ]
+            batting_leaders['BA'] = qualified_batting.nlargest(3, 'BA')
+        
 
-        batting_leaders['H'] = batting_df.loc[
-            batting_leaders['H'].idxmax()
-        ]
+        batting_leaders['H'] = batting_df.nlargest(3, 'H')
 
-        batting_leaders['HR'] = batting_df.loc[
-            batting_leaders['HR'].idxmax()
-        ]
+        batting_leaders['HR'] = batting_df.nlargest(3, 'HR')
         
-        batting_leaders['RBI'] = batting_df.loc[
-            batting_leaders['RBI'].idxmax()
-        ]
+        batting_leaders['RBI'] = batting_df.nlargest(3, 'RBI')
         
-        batting_leaders['R'] = batting_df.loc[
-            batting_leaders['R'].idxmax()
-        ]
+        batting_leaders['R'] = batting_df.nlargest(3, 'R')
         
-        batting_leaders['SB'] = batting_df.loc[
-            batting_leaders['SB'].idxmax()
-        ]
+        batting_leaders['SB'] = batting_df.nlargest(3, 'SB')
         
-        batting_leaders['BB'] = batting_df.loc[
-            batting_leaders['BB'].idxmax()
-        ]
+        batting_leaders['BB'] = batting_df.nlargest(3, 'BB')
         
-        batting_leaders['WAR'] = batting_df.loc[
-            batting_leaders['WAR'].idxmax()
-        ]
+        batting_leaders['WAR'] = batting_df.nlargest(3, 'WAR')
 
     # PITCHING LEADERS
     pitching_leaders = {}
@@ -690,28 +676,16 @@ def get_team_stat_leaders(team_id, year_id):
         qualified_pitching = pitching_df[pitching_df['IP'] > 20]
 
         if not qualified_pitching.empty:
-            pitching_leaders['ERA'] = qualified_pitching.loc[
-                qualified_pitching['ERA'].idxmax()
-            ]
+            pitching_leaders['ERA'] = qualified_pitching.nsmallest(3, 'ERA')
             
-            pitching_leaders['WHIP'] = qualified_pitching.loc[
-                qualified_pitching['WHIP'].idxmax()
-            ]
+            pitching_leaders['WHIP'] = qualified_pitching.nsmallest(3, 'WHIP')
         
-        pitching_leaders['W'] = qualified_pitching.loc[
-            qualified_pitching['W'].idxmax()
-        ]
+        pitching_leaders['W'] = pitching_df.nlargest(3, 'W')
 
-        pitching_leaders['SO'] = qualified_pitching.loc[
-            qualified_pitching['SO'].idxmax()
-        ]
+        pitching_leaders['SO'] = pitching_df.nlargest(3, 'SO')
 
-        pitching_leaders['SV'] = qualified_pitching.loc[
-            qualified_pitching['SV'].idxmax()
-        ]
+        pitching_leaders['SV'] = pitching_df.nlargest(3, 'SV')
 
-        pitching_leaders['WAR'] = qualified_pitching.loc[
-            qualified_pitching['WAR'].idxmax()
-        ]
+        pitching_leaders['WAR'] = pitching_df.nlargest(3, 'WAR')
 
     return batting_leaders, pitching_leaders
