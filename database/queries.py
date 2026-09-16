@@ -201,6 +201,11 @@ def get_pitching_seasons(player_id):
     
     result_df = pd.read_sql_query(query, connection, params=(player_id,))
     
+    # We are having a problem with some of the data coming back as strings
+    # instead of floats or integers. This is causing problems with the 
+    # sorting of the data. Therefore, we are adding this next line to 
+    # convert the data to the correct type.
+    result_df['SO/BB'] = pd.to_numeric(result_df['SO/BB'], errors='coerce')
     connection.close()
     
     return result_df
@@ -587,22 +592,126 @@ def get_team_roster(team_id, year_id):
 
     return batting_team_df, pitching_team_df
 
-def get_team_batting_leaders(year_id):
+def get_team_stat_leaders(team_id, year_id):
     """
     parameter (int): year_id allows us to also pair our statistics with a particular year
-    return (dataframe): dataframe containing the team batting statistics per one stat
+    parameter (str): team_id allows us to pick the specific team we are looking for
+
+    return (dictionaries): dictionaries containing the team statistics for a few stats
     """
 
     connection = get_connection()
 
+    # BATTING LEADERS
     query = """
-        SELECT *
-        FROM team_batting_leaderboard
-        WHERE Year = ?
+        SELECT 
+            Player,
+            H,
+            HR,
+            RBI,
+            R,
+            SB,
+            BB,
+            WAR,
+            BA
+        FROM batting_seasons
+        WHERE Year = ? AND Team = ?
+        ORDER BY PA DESC;
     """
 
-    result_df = pd.read_sql_query(query, connection, params=(year_id,))
+    batting_df = pd.read_sql_query(query, connection, params=(year_id, team_id))
+
+    # PITCHING LEADERS
+    query = """
+        SELECT
+            Player,
+            W,
+            L,
+            SO,
+            ERA,
+            WHIP,
+            SV,
+            WAR,
+            IP
+        FROM pitching_seasons
+        WHERE Team = ? AND Year = ?
+        ORDER BY IP DESC;
+    """
+
+    pitching_df = pd.read_sql_query(query, connection, params=(team_id, year_id))
 
     connection.close()
 
-    return result_df
+    # FILTERING THROUGH THE RESULTS WITH QUALIFIERS
+    batting_leaders = {}
+
+    if not batting_df.empty:
+        # Batting average requires a minimum number of PA 
+        qualified_batting = batting_df[batting_df['PA'] >= 100]
+
+        if not qualified_batting.empty:
+            batting_leaders['BA'] = qualified_batting.loc[
+                qualified_batting['BA'].idxmax()
+            ]
+
+        batting_leaders['H'] = batting_df.loc[
+            batting_leaders['H'].idxmax()
+        ]
+
+        batting_leaders['HR'] = batting_df.loc[
+            batting_leaders['HR'].idxmax()
+        ]
+        
+        batting_leaders['RBI'] = batting_df.loc[
+            batting_leaders['RBI'].idxmax()
+        ]
+        
+        batting_leaders['R'] = batting_df.loc[
+            batting_leaders['R'].idxmax()
+        ]
+        
+        batting_leaders['SB'] = batting_df.loc[
+            batting_leaders['SB'].idxmax()
+        ]
+        
+        batting_leaders['BB'] = batting_df.loc[
+            batting_leaders['BB'].idxmax()
+        ]
+        
+        batting_leaders['WAR'] = batting_df.loc[
+            batting_leaders['WAR'].idxmax()
+        ]
+
+    # PITCHING LEADERS
+    pitching_leaders = {}
+
+    if not pitching_df.empty:
+        # ERA and WHIP require a minimum number of innings
+        qualified_pitching = pitching_df[pitching_df['IP'] > 20]
+
+        if not qualified_pitching.empty:
+            pitching_leaders['ERA'] = qualified_pitching.loc[
+                qualified_pitching['ERA'].idxmax()
+            ]
+            
+            pitching_leaders['WHIP'] = qualified_pitching.loc[
+                qualified_pitching['WHIP'].idxmax()
+            ]
+        
+        pitching_leaders['W'] = qualified_pitching.loc[
+            qualified_pitching['W'].idxmax()
+        ]
+
+        pitching_leaders['SO'] = qualified_pitching.loc[
+            qualified_pitching['SO'].idxmax()
+        ]
+
+        pitching_leaders['SV'] = qualified_pitching.loc[
+            qualified_pitching['SV'].idxmax()
+        ]
+
+        pitching_leaders['WAR'] = qualified_pitching.loc[
+            qualified_pitching['WAR'].idxmax()
+        ]
+
+    return batting_leaders, pitching_leaders

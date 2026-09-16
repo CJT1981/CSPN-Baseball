@@ -10,7 +10,10 @@ def home():
 # Creating a route for the player profile page
 @app.route('/player/<player_id>')
 def player_profile(player_id):
-    # TEST #3:
+    # TEST #5:
+    # While creating an easier way to determine and show data for players regardless of
+    # their position (batter or pitcher)
+
 
     # GET PLAYER PROFILE
     profile_data = get_player_profile(player_id)
@@ -32,25 +35,25 @@ def player_profile(player_id):
     # Here is where we determine if the player is a pitcher or not, 
     # and then pull the appropriate stats.
     if 'Pitcher' in position or 'P' in position:
+        is_pitcher = True
         player_career_stats = get_player_career_pitching(player_id)
         player_season_stats = get_pitching_seasons(player_id)
     else:
+        is_pitcher = False
         player_career_stats = get_player_career_batting(player_id)
         player_season_stats = get_batting_seasons(player_id)
-        """
-        print("========== CAREER STATS ==========")
-        print(player_career_stats)
-        print("Is empty:", player_career_stats.empty)
-        print("Columns:", player_career_stats.columns.tolist())
-        print("==================================")"""
-
+    """
+    # Converting the Dataframes into dictionaries
+    player_career_stats = player_career_stats.to_dict('records')
+    player_career_stats = player_season_stats.to_dict('records')
+    """
     # SEND OUR DATA TO HTML
     return render_template(
         "player_profile.html",
         profile=profile,
         player_career_stats=player_career_stats,
-        player_season_stats=player_season_stats
-
+        player_season_stats=player_season_stats,
+        is_pitcher = is_pitcher
     )
 
 @app.route('/leaderboard/batting/<int:year>')
@@ -186,12 +189,16 @@ def team_page(team_id):
 def teams_roster(team_id, year_id):
     batters, pitchers = get_team_roster(team_id, year_id)
 
+    batting_leaders, pitching_leaders = get_team_stat_leaders(team_id, year_id)
+
     return render_template(
         'team_roster.html',
         team_id=team_id,
         year_id=year_id,
         batters = batters,
-        pitchers = pitchers
+        pitchers = pitchers,
+        batting_leaders = batting_leaders,
+        pitching_leaders = pitching_leaders
     )
 if __name__ == '__main__':
     app.run(debug=True)

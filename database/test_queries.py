@@ -45,6 +45,7 @@ print("=" * 25)
 
 pitching_seasons = get_pitching_seasons("scherma01")
 print(pitching_seasons)
+print(pitching_seasons.columns.to_list())
 
 print("\n")
 
@@ -52,7 +53,7 @@ print("=" * 25)
 print("TESTING TEAM")
 print("=" * 25)
 
-team = get_team("BOS", 2011)
+team = get_team("BOS")
 print(team)
 
 print("\n")

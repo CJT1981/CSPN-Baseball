@@ -153,46 +153,78 @@
         <section class="stats-card">
             <h2>Career Statistics</h2>
             {% if not player_career_stats.empty %}
-            <!-- 
-                We use a table to handle the career statistics quite a few categories
-            -->
-                <div class="table-container">
-                    <table class="stats-table">
-                        <thead>
-                            <tr>
-                                <th>G</th>
-                                <th>H</th>
-                                <th>2B</th>
-                                <th>3B</th>
-                                <th>HR</th>
-                                <th>RBI</th>
-                                <th>BA</th>
-                                <th>OBP</th>
-                                <th>SLG</th>
-                                <th>OPS</th>
-                                <th>WAR</th>
-                            </tr>
-                        </thead>
-                        
-                        <tbody>
-                            {% for _, row in player_career_stats.iterrows() %}
-                            <tr>
-                                <td>{{ row['G'] }}</td>
-                                <td>{{ row['H'] }}</td>
-                                <td>{{ row['2B'] }}</td>
-                                <td>{{ row['3B'] }}</td>
-                                <td>{{ row['HR'] }}</td>
-                                <td>{{ row['RBI'] }}</td>
-                                <td>{{ "%.3f"|format(row['BA']) }}</td>
-                                <td>{{ "%.3f"|format(row['OBP']) }}</td>
-                                <td>{{ "%.3f"|format(row['SLG']) }}</td>
-                                <td>{{ "%.3f"|format(row['OPS']) }}</td>
-                                <td>{{ "%.1f"|format(row['WAR']) }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <!-- PITCHER CAREER STATS -->
+                {% if is_pitcher %}
+                    <div class="table-container">
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th>Games</th>
+                                    <th>Wins</th>
+                                    <th>Losses</th>
+                                    <th>ERA</th>
+                                    <th>Strikeouts</th>
+                                    <th>WHIP</th>
+                                    <th>Saves</th>
+                                    <th>WAR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for _, row in player_career_stats.iterrows() %}
+
+                                <tr>
+                                    <td>{{ row['Games'] }}</td>
+                                    <td>{{ row['Wins'] }}</td>
+                                    <td>{{ row['Losses'] }}</td>
+                                    <td>{{ "%.2f"|format(row['CareerERA']) }}</td>
+                                    <td>{{ row['Strikeouts'] }}</td>
+                                    <td>{{ "%.2f"|format(row['CareerWHIP']) }}</td>
+                                    <td>{{ row['Saves'] }}</td>
+                                    <td>{{ "%.1f"|format(row['CareerWAR']) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="table-container">
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th>G</th>
+                                    <th>H</th>
+                                    <th>2B</th>
+                                    <th>3B</th>
+                                    <th>HR</th>
+                                    <th>RBI</th>
+                                    <th>BA</th>
+                                    <th>OBP</th>
+                                    <th>SLG</th>
+                                    <th>OPS</th>
+                                    <th>WAR</th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                {% for _, row in player_career_stats.iterrows() %}
+                                <tr>
+                                    <td>{{ row['G'] }}</td>
+                                    <td>{{ row['H'] }}</td>
+                                    <td>{{ row['2B'] }}</td>
+                                    <td>{{ row['3B'] }}</td>
+                                    <td>{{ row['HR'] }}</td>
+                                    <td>{{ row['RBI'] }}</td>
+                                    <td>{{ "%.3f"|format(row['BA']) }}</td>
+                                    <td>{{ "%.3f"|format(row['OBP']) }}</td>
+                                    <td>{{ "%.3f"|format(row['SLG']) }}</td>
+                                    <td>{{ "%.3f"|format(row['OPS']) }}</td>
+                                    <td>{{ "%.1f"|format(row['WAR']) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
             {% else %}
             <!-- 
             In case the player doesn't have career statistics in the database
@@ -211,79 +243,162 @@
             <h2>Season Statistics</h2>
 
             {% if not player_season_stats.empty %}
-                <div class="table-container">
-                    <table class="stats-table">
-                        <thead>
-                            <tr>
-                                <th>Year</th>
-                                <th>Team</th>
-                                <th>G</th>
-                                <th>BA</th>
-                                <th>HR</th>
-                                <th>RBI</th>
-                                <th>OBP</th>
-                                <th>SLG</th>
-                                <th>OPS</th>
-                                <th>H</th>
-                                <th>2B</th>
-                                <th>3B</th>
-                                <th>R</th>
-                                <th>AB</th>
-                                <th>BB</th>
-                                <th>PA</th>
-                                <th>SB</th>
-                                <th>TB</th>
-                                <th>HBP</th>
-                                <th>IBB</th>
-                                <th>SF</th>
-                                <th>SH</th>
-                                <th>CS</th>
-                                <th>SO</th>
-                                <th>GIDP</th>
-                                <th>rOBA</th>
-                                <th>Rbat+</th>
-                                <th>OPS+</th>
-                                <th>WAR</th>
-                            </tr>
-                        </thead>
+                <!-- PITCHERS -->
+                {% if is_pitcher %}
+                    <div class="table-container">
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Team</th>
+                                    <th>G</th>
+                                    <th>GS</th>
+                                    <th>W</th>
+                                    <th>L</th>
+                                    <th>W-L%</th>
+                                    <th>WAR</th>
+                                    <th>ERA</th>
+                                    <th>WHIP</th>
+                                    <th>IP</th>
+                                    <th>SO</th>
+                                    <th>BB</th>
+                                    <th>SO/BB</th>
+                                    <th>SHO</th>
+                                    <th>CG</th>
+                                    <th>H</th>
+                                    <th>HR</th>
+                                    <th>R</th>
+                                    <th>ER</th>
+                                    <th>IBB</th>
+                                    <th>HBP</th>
+                                    <th>BK</th>
+                                    <th>WP</th>
+                                    <th>BF</th>
+                                    <th>FIP</th>
+                                    <th>H9</th>
+                                    <th>HR9</th>
+                                    <th>BB9</th>
+                                    <th>SO9</th>
+                                    <th>SV</th>
+                                    <th>ERA+</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for _, row in player_season_stats.iterrows() %}
 
-                        <tbody>
-                            {% for _, row in player_season_stats.iterrows() %}
-                            <tr>
-                                <td>{{ row['Year'] }}</td>
-                                <td>{{ row['Team'] }}</td>
-                                <td>{{ row['G'] }}</td>
-                                <td>{{ "%.3f"|format(row['BA']) }}</td>
-                                <td>{{ row['HR'] }}</td>
-                                <td>{{ row['RBI'] }}</td>
-                                <td>{{ "%.3f"|format(row['OBP']) }}</td>
-                                <td>{{ "%.3f"|format(row['SLG']) }}</td>
-                                <td>{{ "%.3f"|format(row['OPS']) }}</td>
-                                <td>{{ row['H'] }}</td>
-                                <td>{{ row['2B'] }}</td>
-                                <td>{{ row['3B'] }}</td>
-                                <td>{{ row['R'] }}</td>
-                                <td>{{ row['AB'] }}</td>
-                                <td>{{ row['BB'] }}</td>
-                                <td>{{ row['PA'] }}</td>
-                                <td>{{ row['SB'] }}</td>
-                                <td>{{ row['TB'] }}</td>
-                                <td>{{ row['HBP'] }}</td>
-                                <td>{{ row['IBB'] }}</td>
-                                <td>{{ row['SF'] }}</td>
-                                <td>{{ row['SH'] }}</td>
-                                <td>{{ row['CS'] }}</td>
-                                <td>{{ row['SO'] }}</td>
-                                <td>{{ row['GIDP'] }}</td>
-                                <td>{{ "%.3f"|format(row['rOBA']) }}</td>
-                                <td>{{ row['Rbat+'] }}</td>
-                                <td>{{ row['OPS+'] }}</td>
-                                <td>{{ "%.1f"|format(row['WAR']) }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                                <tr>
+                                    <td>{{ row['Year'] }}</td>
+                                    <td>{{ row['Team'] }}</td>
+                                    <td>{{ row['G'] }}</td>
+                                    <td>{{ row['GS'] }}</td>
+                                    <td>{{ row['W'] }}</td>
+                                    <td>{{ row['L'] }}</td>
+                                    <td>{{ "%.3f"|format(row['W-L%']) }}</td>
+                                    <td>{{ "%.1f"|format(row['WAR']) }}</td>
+                                    <td>{{ "%.2f"|format(row['ERA']) }}</td>
+                                    <td>{{ "%.2f"|format(row['WHIP']) }}</td>
+                                    <td>{{ row['IP'] }}</td>
+                                    <td>{{ row['SO'] }}</td>
+                                    <td>{{ row['BB'] }}</td>
+                                    <td>{{ "%.2f"|format(row['SO/BB']) }}</td>
+                                    <td>{{ row['SHO'] }}</td>
+                                    <td>{{ row['CG'] }}</td>
+                                    <td>{{ row['H'] }}</td>
+                                    <td>{{ row['HR'] }}</td>
+                                    <td>{{ row['R'] }}</td>
+                                    <td>{{ row['ER'] }}</td>
+                                    <td>{{ row['IBB'] }}</td>
+                                    <td>{{ row['HBP'] }}</td>
+                                    <td>{{ row['BK'] }}</td>
+                                    <td>{{ row['WP'] }}</td>
+                                    <td>{{ row['BF'] }}</td>
+                                    <td>{{ "%.2f"|format(row['FIP']) }}</td>
+                                    <td>{{ "%.2f"|format(row['H9']) }}</td>
+                                    <td>{{ "%.2f"|format(row['HR9']) }}</td>
+                                    <td>{{ "%.2f"|format(row['BB9']) }}</td>
+                                    <td>{{ "%.2f"|format(row['SO9']) }}</td>
+                                    <td>{{ row['SV'] }}</td>
+                                    <td>{{ row['ERA+'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="table-container">
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Team</th>
+                                    <th>G</th>
+                                    <th>BA</th>
+                                    <th>HR</th>
+                                    <th>RBI</th>
+                                    <th>OBP</th>
+                                    <th>SLG</th>
+                                    <th>OPS</th>
+                                    <th>H</th>
+                                    <th>2B</th>
+                                    <th>3B</th>
+                                    <th>R</th>
+                                    <th>AB</th>
+                                    <th>BB</th>
+                                    <th>PA</th>
+                                    <th>SB</th>
+                                    <th>TB</th>
+                                    <th>HBP</th>
+                                    <th>IBB</th>
+                                    <th>SF</th>
+                                    <th>SH</th>
+                                    <th>CS</th>
+                                    <th>SO</th>
+                                    <th>GIDP</th>
+                                    <th>rOBA</th>
+                                    <th>Rbat+</th>
+                                    <th>OPS+</th>
+                                    <th>WAR</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for _, row in player_season_stats.iterrows() %}
+                                <tr>
+                                    <td>{{ row['Year'] }}</td>
+                                    <td>{{ row['Team'] }}</td>
+                                    <td>{{ row['G'] }}</td>
+                                    <td>{{ "%.3f"|format(row['BA']) }}</td>
+                                    <td>{{ row['HR'] }}</td>
+                                    <td>{{ row['RBI'] }}</td>
+                                    <td>{{ "%.3f"|format(row['OBP']) }}</td>
+                                    <td>{{ "%.3f"|format(row['SLG']) }}</td>
+                                    <td>{{ "%.3f"|format(row['OPS']) }}</td>
+                                    <td>{{ row['H'] }}</td>
+                                    <td>{{ row['2B'] }}</td>
+                                    <td>{{ row['3B'] }}</td>
+                                    <td>{{ row['R'] }}</td>
+                                    <td>{{ row['AB'] }}</td>
+                                    <td>{{ row['BB'] }}</td>
+                                    <td>{{ row['PA'] }}</td>
+                                    <td>{{ row['SB'] }}</td>
+                                    <td>{{ row['TB'] }}</td>
+                                    <td>{{ row['HBP'] }}</td>
+                                    <td>{{ row['IBB'] }}</td>
+                                    <td>{{ row['SF'] }}</td>
+                                    <td>{{ row['SH'] }}</td>
+                                    <td>{{ row['CS'] }}</td>
+                                    <td>{{ row['SO'] }}</td>
+                                    <td>{{ row['GIDP'] }}</td>
+                                    <td>{{ "%.3f"|format(row['rOBA']) }}</td>
+                                    <td>{{ row['Rbat+'] }}</td>
+                                    <td>{{ row['OPS+'] }}</td>
+                                    <td>{{ "%.1f"|format(row['WAR']) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
             {% else %}
                 <p class="no-data">
                     No season statistics available.
