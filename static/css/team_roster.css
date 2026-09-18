@@ -1,0 +1,89 @@
+/* TEAM STAT LEADERS */
+
+.team-leaders{
+    width: 90%;
+    margin: 50px auto;
+}
+
+.team-leaders > h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Two main columns */
+.leaders-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+}
+
+/* Column headings */
+.batting-leaders h3,
+.pitching-leaders h3 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* Stack the tables vertically */
+.leader-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Individual stat card */
+.leader-card {
+    width: 100%;
+}
+
+/* Tables */
+.leader-card table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* Table cells */
+.leader-card th:first-child,
+.leader-card td:first-child {
+    width: 70%;
+}
+
+.leader-card th:last-child,
+.leader-card td:last-child {
+    width: 30%;
+}
+
+.leader-card th,
+.leader-card td {
+    padding: 8px 12px;
+}
+
+.leader-card th:first-child,
+.leader-card td:first-child {
+    text-align: left;
+}
+
+.leader-card th:last-child,
+.leader-card td:last-child {
+    text-align: center;
+}
+
+/* Statistic header */
+.leader-card th {
+    font-weight: bold;
+}
+
+/* Player names */
+.leader-card td {
+    text-align: left;
+}
+
+/* Player links */
+.leader-card a {
+    text-decoration: none;
+}
+
+.leader-card a {
+    text-decoration: underline;
+}

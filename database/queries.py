@@ -605,6 +605,7 @@ def get_team_stat_leaders(team_id, year_id):
     # BATTING LEADERS
     query = """
         SELECT 
+            player_id,
             Player,
             H,
             HR,
@@ -625,6 +626,7 @@ def get_team_stat_leaders(team_id, year_id):
     # PITCHING LEADERS
     query = """
         SELECT
+            player_id,
             Player,
             W,
             L,
@@ -648,7 +650,7 @@ def get_team_stat_leaders(team_id, year_id):
 
     if not batting_df.empty:
         # Batting average requires a minimum number of PA 
-        qualified_batting = batting_df[batting_df['PA'] >= 100]
+        qualified_batting = batting_df[batting_df['PA'] >= 200]
 
         if not qualified_batting.empty:
             batting_leaders['BA'] = qualified_batting.nlargest(3, 'BA')
@@ -673,7 +675,7 @@ def get_team_stat_leaders(team_id, year_id):
 
     if not pitching_df.empty:
         # ERA and WHIP require a minimum number of innings
-        qualified_pitching = pitching_df[pitching_df['IP'] > 20]
+        qualified_pitching = pitching_df[pitching_df['IP'] > 80]
 
         if not qualified_pitching.empty:
             pitching_leaders['ERA'] = qualified_pitching.nsmallest(3, 'ERA')

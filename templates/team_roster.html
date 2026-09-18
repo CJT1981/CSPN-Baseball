@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{{ team_id }} {{ year_id }} Roster</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/team.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/team_roster.css') }}">
 </head>
 
+<!-- TEAM ROSTER -->
 <body>
     <h1>{{ team_id }} - {{ year_id }} Roster</h1>
 
@@ -72,131 +73,104 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- TEAM STAT LEADERS -->
+    <section class="team-leaders">
+        <h2>Team Stat Leaders</h2>
+
+        <div class="leaders-columns">
+            <!-- BATTING LEADERS -->
+            <div class="batting-leaders">
+                
+                <h3>Batting Leaders</h3>
+
+                <div class="leader-grid">
+                    {% for stat, leaders in batting_leaders.items() %}
+                        <div class="leader-card">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Player</th>
+                                        <th>{{ stat }}</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for index, player in leaders.iterrows() %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ url_for(
+                                                    'player_profile',
+                                                    player_id=player['player_id']
+                                                ) }}">
+                                                    {{ player['Player'] }}
+                                                </a>
+                                            </td>
+
+                                            <td>
+                                                {% if stat == 'BA' %}
+                                                    {{ "%.3f"|format(player[stat])|replace('0.','.') }}
+                                                {% elif stat == 'WAR' %}
+                                                    {{ "%.1f"|format(player[stat]) }}
+                                                {% else %}
+                                                    {{ player[stat] }}
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- PITCHING LEADERS -->
+            <div class="pitching-leaders">
+                <h3>Pitching Leaders</h3>
+
+                <div class="leader-grid">
+                    {% for stat, leaders in pitching_leaders.items() %}
+                        <div class="leader-card">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Player</th>
+                                        <th>{{ stat }}</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for index, player in leaders.iterrows() %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ url_for(
+                                                    'player_profile',
+                                                    player_id=player['player_id']
+                                                )}}">
+                                                    {{ player['Player'] }}
+                                                </a>
+                                            </td>
+
+                                            <td>
+                                                {% if stat in ['ERA', 'WHIP'] %}
+                                                    {{ "%.2f"|format(player[stat]) }}
+                                                {% elif stat == 'WAR' %}
+                                                    {{ "%.1f"|format(player[stat]) }}
+                                                {% else %}
+                                                    {{ player[stat] }}
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
-
-<h3>Batting Leaders</h3>
-
-<table>
-    <thead>
-        <tr>
-            <th>Stat</th>
-            <th>Player</th>
-            <th>Value</th>
-        </tr>
-    </thead>
-
-    <tbody>
-
-        {% for stat, leaders in batting_leaders.items() %}
-
-            {% for index, player in leaders.iterrows() %}
-
-                <tr>
-
-                    {% if loop.first %}
-                        <td>{{ stat }}</td>
-                    {% else %}
-                        <td></td>
-                    {% endif %}
-
-                    <td>
-                        <a href="{{ url_for(
-                            'player_profile',
-                            player_id=player['player_id']
-                        ) }}">
-                            {{ player['Player'] }}
-                        </a>
-                    </td>
-
-                    <td>
-
-                        {% if stat == 'BA' %}
-
-                            {{ "%.3f"|format(
-                                player['BA']
-                            )|replace('0.', '.')
-                            }}
-
-                        {% elif stat in ['WAR'] %}
-
-                            {{ "%.1f"|format(player[stat]) }}
-
-                        {% else %}
-
-                            {{ player[stat] }}
-
-                        {% endif %}
-
-                    </td>
-
-                </tr>
-
-            {% endfor %}
-
-        {% endfor %}
-
-    </tbody>
-</table>
-
-<h3>Pitching Leaders</h3>
-
-<table>
-    <thead>
-        <tr>
-            <th>Stat</th>
-            <th>Player</th>
-            <th>Value</th>
-        </tr>
-    </thead>
-
-    <tbody>
-
-        {% for stat, leaders in pitching_leaders.items() %}
-
-            {% for index, player in leaders.iterrows() %}
-
-                <tr>
-
-                    {% if loop.first %}
-                        <td>{{ stat }}</td>
-                    {% else %}
-                        <td></td>
-                    {% endif %}
-
-                    <td>
-                        <a href="{{ url_for(
-                            'player_profile',
-                            player_id=player['player_id']
-                        ) }}">
-                            {{ player['Player'] }}
-                        </a>
-                    </td>
-
-                    <td>
-
-                        {% if stat in ['ERA', 'WHIP'] %}
-
-                            {{ "%.2f"|format(player[stat]) }}
-
-                        {% elif stat == 'WAR' %}
-
-                            {{ "%.1f"|format(player[stat]) }}
-
-                        {% else %}
-
-                            {{ player[stat] }}
-
-                        {% endif %}
-
-                    </td>
-
-                </tr>
-
-            {% endfor %}
-
-        {% endfor %}
-
-    </tbody>
-</table>
 
 </html>
