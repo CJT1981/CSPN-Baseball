@@ -1,3 +1,87 @@
+/* TEAM ROSTER */
+
+.team-roster {
+    width: 90%;
+    margin: 30px auto 50px auto;
+}
+
+.team-roster > h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* TWO MAIN COLUMNS */
+
+.roster-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+} 
+
+/* SECTION HEADINGS */
+
+.roster-section h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ROSTER TABLE */
+
+.roster-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* COLUMN WIDTHS */
+
+.roster-table th:nth-child(1),
+.roster-table td:nth-child(1) {
+    width: 55%;
+}
+
+.roster-table th:nth-child(2),
+.roster-table td:nth-child(2) {
+    width: 25%;
+}
+
+.roster-table th:nth-child(3),
+.roster-table td:nth-child(3) {
+    width: 20%;
+}
+
+/* CELLS */
+
+.roster-table th,
+.roster-table td {
+    padding: 8px 12px;
+}
+
+/* ALIGNMENT */
+
+.roster-table th {
+    text-align: center;
+}
+
+.roster-table td:first-child {
+    text-align: left;
+}
+
+.roster-table td:nth-child(2),
+.roster-table td:nth-child(3) {
+    text-align: center;
+}
+
+/* PLAYER LINKS */
+
+.roster-table a {
+    text-decoration: none;
+}
+
+.roster-table a:hover {
+    text-decoration: underline;
+}
+
 /* TEAM STAT LEADERS */
 
 .team-leaders{
