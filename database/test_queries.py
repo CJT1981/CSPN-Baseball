@@ -102,5 +102,23 @@ print("=" * 25)
 print("TESTING BATTING TEAM LEADERS")
 print("=" * 25)
 
-team_leaders = get_team_batting_leaders(2023)
+team_leaders = get_team_stat_leaders("SFG",2023)
 print(team_leaders)
+
+print("\n")
+
+print("=" * 25)
+print("TESTING AWARDS")
+print("=" * 25)
+
+awards = get_awards(2023)
+print(awards)
+
+print("\nNATIONAL LEAGUE MVP:")
+print(awards['NL']['MVP'])
+
+print("\nNATIONAL LEAGUE CYA:")
+print(awards['NL']['CYA'])
+
+print("\nNATIONAL LEAGUE ALL-STARS:")
+print(awards['NL']['AS'])

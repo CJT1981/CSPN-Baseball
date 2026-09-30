@@ -200,6 +200,16 @@ def teams_roster(team_id, year_id):
         batting_leaders = batting_leaders,
         pitching_leaders = pitching_leaders
     )
+    
+@app.route('/awards/<int:year_id>')
+def awards(year_id):
+    batting_awards, pitching_awards = get_awards(year_id)
+    
+    return render_template(
+        'awards.html',
+        batting_awards = batting_awards,
+        pitching_awards = pitching_awards
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

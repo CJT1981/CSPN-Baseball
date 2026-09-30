@@ -691,3 +691,168 @@ def get_team_stat_leaders(team_id, year_id):
         pitching_leaders['WAR'] = pitching_df.nlargest(3, 'WAR')
 
     return batting_leaders, pitching_leaders
+
+def get_awards(year_id):
+    """ 
+    WE WANT TO RETURN ALL THE AWARDS FOR A SPECIFIC YEAR.
+    
+    RETURNS:
+        - A dictionary containg awards separated by league
+    """
+    
+    connection = get_connection()
+    
+    # Here is where we get our batting awards
+    batting_query = """
+        SELECT 
+            b.player_id,
+            b.Player, 
+            b.Team, 
+            b.Year, 
+            b.Awards, 
+            f.league
+        FROM batting_statistics b
+        JOIN franchise_history f
+            ON b.Team = f.team_id
+            AND b.Year = f.year_id
+        WHERE b.Year = ?
+        AND b.Awards IS NOT NULL
+        AND b.Awards != '';
+    """
+    
+    batting_df = pd.read_sql_query(
+        batting_query,
+        connection,
+        params=(year_id,)
+    )
+
+    # Here is where we are getting our pitching awards
+    pitching_query = """
+        SELECT
+            p.player_id,
+            p.Player,
+            p.Team,
+            p.Year,
+            p.Awards,
+            f.league
+        FROM pitching_statistics p
+        JOIN franchise_history f
+            ON p.Team = f.team_id
+            AND p.Year = f.year_id
+        WHERE p.Year = ?
+        AND p.Awards IS NOT NULL
+        AND p.Awards != '';
+    """
+    
+    pitching_df = pd.read_sql_query(
+        pitching_query,
+        connection,
+        params=(year_id,)    
+    )
+    
+    award_type_query = """
+        SELECT
+            award_code,
+            award_name
+        FROM award_types;
+    """
+    
+    # Here we are going to pull the award code/names
+    award_types_df = pd.read_sql_query(
+        award_type_query,
+        connection
+    )
+        
+    connection.close()
+    
+    # We are creating a lookup dictionary
+    awards_names = dict(
+        zip(
+            award_types_df['award_code'],
+            award_types_df['award_name']
+        )
+    )
+    
+    # Combing the batting and pitching awards
+    all_awards_df = pd.concat(
+        [batting_df, pitching_df],
+        ignore_index=True
+    )
+    
+    awards = {
+        'AL': {},
+        'NL': {}
+    }
+    
+    # Here we begin processing each player
+    for _, player in all_awards_df.iterrows():
+        
+        league = player['league']
+        awards_string = player['Awards']
+        
+        # Here is where we are going to split the award string into
+        # individual values for individual awards such as
+        # "AS,MVP-11,SS" --> ["AS", "MVP-11", "SS"]
+        awards_list = awards_string.split(',')
+        
+        for award in awards_list:
+            # Removing the whitespaces
+            award = award.strip()
+            
+            if not award:
+                continue
+            
+            # Here we need to determine if there is a ranking or not
+            if '-' in award:
+                award_code, ranking = award.split('-',1)
+                
+                try:
+                    ranking = int(ranking)
+                except ValueError:
+                    ranking = None 
+            else:
+                award_code = award
+                ranking = None
+            
+            # Get full award name
+            award_name = awards_names.get(
+                award_code,
+                award_code
+            )
+            
+            # Logging awards 
+            award_entry = {
+                'player_id': player['player_id'],
+                'Player': player['Player'],
+                'Team': player['Team'],
+                'ranking': ranking
+            }
+            
+            # Creating the awards
+            if award_code not in awards[league]:
+                awards[league][award_code] = {
+                    'name': award_name,
+                    'players': []
+                }
+            
+            # Here is where need to add the players
+            awards[league][award_code]['players'].append(
+                award_entry
+            )
+    
+    # Here we are sorting the ranked awards by ranking:
+    for league in awards:
+        for award_code in awards[league]:
+            
+            players = awards[league][award_code]['players']
+            
+            players.sort(
+                key=lambda player: (
+                    player['ranking'] is None,
+                    player['ranking']
+                    if player['ranking'] is not None
+                    else 0
+                )
+            )
+    
+    return awards
