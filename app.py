@@ -203,12 +203,16 @@ def teams_roster(team_id, year_id):
     
 @app.route('/awards/<int:year_id>')
 def awards(year_id):
-    batting_awards, pitching_awards = get_awards(year_id)
+    # 1st Iteration 
+    # No issues, data is correctly being pulled but the problem is 
+    # with the get_awards function with it returning duplicate
+    
+    awards = get_awards(year_id)
     
     return render_template(
         'awards.html',
-        batting_awards = batting_awards,
-        pitching_awards = pitching_awards
+        year_id=year_id,
+        awards=awards
     )
 
 if __name__ == '__main__':

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{{ year_id }} Awards</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/awards.css') }}">
+</head>
+
+<body>
+  <div class="awards-page">
+    <div class='awards-header'>
+      <h1>{{ year_id }} Awards</h1>
+      
+      <div class="year-selector">
+        <label for="year">Year:</label>
+
+        <select id="year" onchange="changeYear(this.value)">
+          {% for year in range(2025,1900,-1) %}
+            <option value="{{ year }}"
+              {% if year == year_id %}selected{% endif %}>
+              {{ year }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  
+    <div class="league-container">
+      <section class="league-section">
+        
+        <div class="league-header">
+          <h2>American League</h2>
+        </div>
+
+        {% set award_order = [
+          'MVP',
+          'CYA',
+          'ROY',
+          'AS',
+          'SS',
+          'GG',
+        ] %}
+
+        {% for award_code in award_order %}
+
+          {% if award_code in awards['AL'] %}
+            {% set award = awards['AL'][award_code] %}
+
+            <div class="award-card">
+              <div class="award-header">
+                <h3>{{ award['name'] }}</h3>
+              </div>
+              
+              <div class="award-players">
+                {% for player in award['players'] %}
+
+                  <div class="award-player
+                    {% if award_code in ['MVP', 'CYA', 'ROY'] and loop.index > 3 %}
+                      hidden-player
+                    {% endif %}"
+                    {% if award_code in ['MVP', 'CYA', 'ROY'] and loop.index > 3 %}
+                      style="display: none;"
+                    {% endif %}>
+
+                    <div class="player-ranking">
+                      {% if player['ranking'] is not none %}
+                        {{ player['ranking'] }}
+                      {% else %}
+                        {{ player['Pos']}}
+                      {% endif %}
+                    </div>
+
+                    <div class="player-name">
+                      {{ player['Player'] }}
+                    </div>
+
+                    <div class="player-team">
+                      {{ player['Team'] }}
+                    </div>
+
+                  </div>
+                {% endfor %}
+              </div>
+
+              {% if award_code in ['MVP', 'CYA', 'ROY'] and award['players']|length > 3 %}
+
+                <button
+                  type="button"
+                  class="show-more-button"
+                  onclick="toggleAward(this)">
+                  Show More
+                </button>
+
+              {% endif %}
+
+            </div>
+          {% endif %}
+        {% endfor %}
+      </section>
+
+      <section class="league-section">
+        <div class="league-header">
+          <h2>National League</h2>
+        </div>
+
+        {% for award_code in award_order %}
+          {% if award_code in awards['NL'] %}
+            {% set award = awards['NL'][award_code] %}
+
+            <div class="award-card">
+              <div class="award-header">
+                <h3>{{ award['name'] }}</h3>
+              </div>
+
+              <div class="award-players">
+                {% for player in award['players'] %}
+
+                  <div class="award-player
+                    {% if award_code in ['MVP', 'CYA', 'ROY'] and loop.index > 3 %}
+                      hidden-player
+                    {% endif %}"
+                    {% if award_code in ['MVP', 'CYA', 'ROY'] and loop.index > 3 %}
+                      style="display: none;"
+                    {% endif %}>
+
+                    <div class="player-ranking">
+                      {% if player['ranking'] is not none %}
+                        {{ player['ranking'] }}
+                      {% else %}
+                        {{ player['Pos']}}
+                      {% endif %}
+                    </div>
+
+                    <div class="player-name">
+                      {{ player['Player'] }}
+                    </div>
+
+                    <div class="player-team">
+                      {{ player['Team'] }}
+                    </div>
+
+                  </div>
+                {% endfor %}
+              </div>
+
+              {% if award_code in ['MVP', 'CYA', 'ROY'] and award['players']|length > 3 %}
+
+                <button
+                  type="button"
+                  class="show-more-button"
+                  onclick="toggleAward(this)">
+                  Show More
+                </button>
+
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    function changeYear(year) {
+      window.location.href = `/awards/${year}`;
+    }
+
+    function toggleAward(button) {
+      const awardCard = button.closest('.award-card');
+
+      const hiddenPlayers = awardCard.querySelectorAll('.hidden-player');
+
+      const isExpanded = button.dataset.expanded === 'true';
+
+      if(isExpanded) {
+
+        hiddenPlayers.forEach(function(player) {
+          player.style.display = 'none';
+        });
+
+        button.textContent = 'Show More';
+        button.dataset.expanded = 'false';
+      } else {
+
+        hiddenPlayers.forEach(function(player) {
+          player.style.display = 'grid';
+        });
+        
+        button.textContent = 'Show Less';
+        button.dataset.expanded = 'true';
+      }
+    }
+  </script>
+</body>
+</html>

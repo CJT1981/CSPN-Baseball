@@ -710,6 +710,7 @@ def get_awards(year_id):
             b.Team, 
             b.Year, 
             b.Awards, 
+            b.Pos,
             f.league
         FROM batting_statistics b
         JOIN franchise_history f
@@ -734,6 +735,7 @@ def get_awards(year_id):
             p.Team,
             p.Year,
             p.Awards,
+            p.Pos,
             f.league
         FROM pitching_statistics p
         JOIN franchise_history f
@@ -779,6 +781,12 @@ def get_awards(year_id):
         ignore_index=True
     )
     
+    # Our results are yielding some duplicates, so therefore 
+    # we are going to remove duplicates here
+    all_awards_df = all_awards_df.drop_duplicates(
+        subset=['player_id', 'Year', 'Team', 'Awards']
+    )
+    
     awards = {
         'AL': {},
         'NL': {}
@@ -821,10 +829,14 @@ def get_awards(year_id):
             )
             
             # Logging awards 
+            # Problem: if a player got traded mid-season, they show up
+            # twice in the awards list. We want it to be one entry per 
+            # player 
             award_entry = {
                 'player_id': player['player_id'],
                 'Player': player['Player'],
                 'Team': player['Team'],
+                'Pos': player['Pos'],
                 'ranking': ranking
             }
             
@@ -835,10 +847,26 @@ def get_awards(year_id):
                     'players': []
                 }
             
-            # Here is where need to add the players
-            awards[league][award_code]['players'].append(
-                award_entry
+            # Here we check if the player is already in the list of 
+            # players for this award
+            existing_player = next(
+                (
+                    p for p in awards[league][award_code]['players']
+                    if p['player_id'] == player['player_id']
+                ),
+                None
             )
+            
+            if existing_player:
+                # Here we add the second team if it isn't listed
+                existing_teams = existing_player['Team'].split('/')
+                
+                if player['Team'] not in existing_teams:
+                    existing_player['Team'] += f" / {player['Team']}"
+            else:
+                awards[league][award_code]['players'].append(
+                    award_entry
+                )
     
     # Here we are sorting the ranked awards by ranking:
     for league in awards:
