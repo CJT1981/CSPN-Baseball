@@ -1,10 +1,45 @@
-<!DOCTYPE html> 
-<html lang="en">
-<head>
-    <title>CSPN Baseball</title>
-</head>
-<body>
-    <h1>Welcome to CSPN Baseball</h1>
-    <p>This is a simple Flask app for displaying baseball player information.</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}
+    CSPN Baseball - Player Search
+{% endblock %}
+
+{% block content %}
+    <div class="player-search">
+        <h1>CSPN Baseball</h1>
+        
+        <h2>Search for a Player</h2>
+
+        <form method="GET" action="{{ url_for('home') }}">
+            <input 
+                type="text"
+                name="search"         
+                placeholder="Enter player name..."
+                value="{{ search_query or '' }}"
+            >
+            <button type="submit">Search</button>
+        </form>
+
+        {% if search_performed %}
+            <h2>Search Results</h2>
+
+            {% if players.empty %}
+                <p>No players found.</p>
+            {% else %}
+                <div class="search-results">
+                    {% for index, player in players.iterrows() %}
+                        <div class="player-result">
+
+                            <a href="{{ url_for(
+                                'player_profile',
+                                player_id=player['player_id']
+                            ) }}">
+                                {{ player['player_name'] }}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}

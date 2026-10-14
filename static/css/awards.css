@@ -82,7 +82,7 @@ body {
 
 .award-player {
   display: grid;
-  grid-template-columns: 35px minmax(0, 1fr) 50px;
+  grid-template-columns: 35px minmax(0, 1fr) 80px;
   align-items: center;
   padding: 10px 0;
   border-bottom: 1px solid #eee;
@@ -104,10 +104,9 @@ body {
 .player-team {
   text-align: right;
   font-weight: bold;
+  white-space: nowrap;
 }
-.award-player:not(:has(.player-ranking)) {
-  grid-template-columns: minmax(0, 1fr) 60px;
-}
+
 .show-more-button {
   display: block;
   width: calc(100% - 40px);

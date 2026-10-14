@@ -474,12 +474,14 @@ def get_player_search(user_input):
         SELECT
             player_id,
             player_name
-        FROM player_bio
+        FROM player_profiles
         WHERE player_name LIKE ?
         ORDER BY player_name;
         """
 
-    result_df = pd.read_sql_query(query, connection, params=(user_input))
+    search_value = f"%{user_input}%"
+    
+    result_df = pd.read_sql_query(query, connection, params=(search_value,))
 
     connection.close()
 
@@ -714,7 +716,10 @@ def get_awards(year_id):
             f.league
         FROM batting_statistics b
         JOIN franchise_history f
-            ON b.Team = f.team_id
+            ON (
+                b.Team = f.franchise_id
+                OR b.Team = f.team_id
+            )
             AND b.Year = f.year_id
         WHERE b.Year = ?
         AND b.Awards IS NOT NULL
@@ -739,7 +744,10 @@ def get_awards(year_id):
             f.league
         FROM pitching_statistics p
         JOIN franchise_history f
-            ON p.Team = f.team_id
+            ON (
+                p.Team = f.franchise_id
+                OR p.Team = f.team_id
+            )
             AND p.Year = f.year_id
         WHERE p.Year = ?
         AND p.Awards IS NOT NULL

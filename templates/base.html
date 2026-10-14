@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+            CSPN Baseball
+        {% endblock %}
+    </title>
+
+    <link rel="stylesheet" 
+        href="{{ url_for('static', filename='css/app_style.css') }}">
+
+    {% block page_css %}
+    {% endblock %}
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="{{ url_for('home') }}">
+                CSPN Baseball
+            </a>
+        </div>
+
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Players</a>
+            <a href="{{ url_for('batting_leaderboard', year=2025) }}">Batting Leaders</a>
+            <a href="{{ url_for('pitching_leaderboard', year=2025) }}">Pitching Leaders</a>
+            <a href="{{ url_for('awards', year_id=2025) }}">Awards</a>
+            <a href="{{ url_for('teams') }}">Teams</a>
+        </div>
+
+        <form action="{{ url_for('home') }}" method="GET">
+            <input
+                type="text"
+                name="search"
+                placeholder="Search players.."
+            >
+            <button type="submit">Search</button>
+        </form>
+    </nav>    
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+</body>
+</html>

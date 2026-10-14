@@ -1,18 +1,33 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from database.queries import *
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    # 1st Iteration
+    search_query = request.args.get('search', '').strip()
+
+    players = None
+    search_performed = False
+
+    if search_query:
+        players = get_player_search(search_query)
+        search_performed = True
+
+    return render_template(
+        'home.html',
+        players=players,
+        search_query=search_query,
+        search_performed=search_performed
+    )
 
 # Creating a route for the player profile page
 @app.route('/player/<player_id>')
 def player_profile(player_id):
-    # TEST #5:
-    # While creating an easier way to determine and show data for players regardless of
-    # their position (batter or pitcher)
+    # TEST #6:
+    # We need to account for players like Shohei Ohtani, where they have both batting 
+    # and pitching statistics. We need to be able to pull both data sets.
 
 
     # GET PLAYER PROFILE
@@ -24,24 +39,21 @@ def player_profile(player_id):
 
     # DETERMINE IF PLAYER IS A PITCHER OR NON-PITCHER
     profile = profile_data.iloc[0].to_dict()
-    
-    # Because we pulled a whole Panda series, we need to pull the position from the 
-    # series to determine if we need to pull pitching or batting stats.
-    # Here is where we pull the position:
-    position = profile['position']
 
-    player_season_stats = None
+    pitching_career_stats = get_player_career_pitching(player_id)
+    pitching_season_stats = get_pitching_seasons(player_id)
 
-    # Here is where we determine if the player is a pitcher or not, 
-    # and then pull the appropriate stats.
-    if 'Pitcher' in position or 'P' in position:
-        is_pitcher = True
-        player_career_stats = get_player_career_pitching(player_id)
-        player_season_stats = get_pitching_seasons(player_id)
-    else:
-        is_pitcher = False
-        player_career_stats = get_player_career_batting(player_id)
-        player_season_stats = get_batting_seasons(player_id)
+    batting_career_stats = get_player_career_batting(player_id)
+    batting_season_stats = get_batting_seasons(player_id)
+
+    has_batting_stats = (
+        not batting_career_stats.empty or not batting_season_stats.empty
+    )
+
+    has_pitching_stats = (
+        not pitching_career_stats.empty or not pitching_season_stats.empty
+    )
+
     """
     # Converting the Dataframes into dictionaries
     player_career_stats = player_career_stats.to_dict('records')
@@ -51,9 +63,12 @@ def player_profile(player_id):
     return render_template(
         "player_profile.html",
         profile=profile,
-        player_career_stats=player_career_stats,
-        player_season_stats=player_season_stats,
-        is_pitcher = is_pitcher
+        batting_season_stats=batting_season_stats,
+        batting_career_stats=batting_career_stats,
+        pitching_season_stats=pitching_season_stats,
+        pitching_career_stats=pitching_career_stats,
+        has_batting_stats=has_batting_stats,
+        has_pitching_stats=has_pitching_stats
     )
 
 @app.route('/leaderboard/batting/<int:year>')

@@ -1,3 +1,12 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+    {{ team_id }} {{ year_id }} Roster | CSPN Baseball
+{% endblock %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,68 +20,6 @@
 
 <!-- TEAM ROSTER -->
 <body>
-
-    <!-- BATTERS 
-    <h2>Batters</h2>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Players</th>
-                <th>Position</th>
-                <th>Games</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for index, player in batters.iterrows() %}
-                <tr>
-                    <td>
-                        <a href="{{ url_for(
-                            'player_profile',
-                            player_id=player['player_id']
-                            )}}">
-                            {{ player['Player'] }}
-                        </a>
-                    </td>
-
-                    <td>{{ player['Pos'] }}</td>
-                    <td>{{ player['G'] }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    PITCHERS 
-    <h2>Pitchers</h2>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Player</th>
-                <th>Position</th>
-                <th>Games</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for index, player in pitchers.iterrows() %}
-                <tr> 
-                    <td>
-                        <a href="{{ url_for(
-                            'player_profile',
-                            player_id=player['player_id']
-                        )}}">
-                            {{ player['Player'] }}
-                        </a>
-                    </td>
-                    <td>{{ player['Pos'] }}</td>
-                    <td>{{ player['G'] }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
--->
 
     <section class="team-roster">
         <h2>{{ team_id }} - {{ year_id }} Roster</h2>
@@ -244,3 +191,4 @@
 </body>
 
 </html>
+{% endblock %}

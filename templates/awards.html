@@ -1,3 +1,12 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+    {{ year_id }} Awards | CSPN Baseball
+{% endblock %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -39,9 +48,9 @@
           'MVP',
           'CYA',
           'ROY',
-          'AS',
           'SS',
           'GG',
+          'AS'
         ] %}
 
         {% for award_code in award_order %}
@@ -197,3 +206,5 @@
   </script>
 </body>
 </html>
+
+{% endblock %}
